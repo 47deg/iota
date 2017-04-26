@@ -23,3 +23,6 @@ metastore_db/
 checkpoint/
 testData/
 .phantom-temp
+
+# PGP keys
+secring.asc

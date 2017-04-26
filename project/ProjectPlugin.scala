@@ -40,7 +40,7 @@ object ProjectPlugin extends AutoPlugin {
         (unmanagedSourceDirectories in sc) ++= {
           (unmanagedSourceDirectories in sc ).value.flatMap { dir: File =>
             CrossVersion.partialVersion(scalaVersion.value) match {
-              case Some((2, y)) => Some(new File(dir.getPath + "_2.11"))
+              case Some((2, _)) => Some(new File(dir.getPath + "_2.11"))
               case _            => None
             }
           }
@@ -64,7 +64,6 @@ object ProjectPlugin extends AutoPlugin {
     description := "fast product/coproduct types",
     startYear := Option(2016),
 
-    orgMaintainersSetting += Dev("andyscott", Some("Andy Scott")),
     orgBadgeListSetting := List(
       TravisBadge.apply(_),
       MavenCentralBadge.apply(_),
@@ -81,6 +80,8 @@ object ProjectPlugin extends AutoPlugin {
       "test".asRunnableItemFull,
       "tutReadme".asRunnableItem
     ),
+    orgUpdateDocFilesSetting +=
+      (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
     orgEnforcedFilesSetting ~= (_ filterNot (_ == ScalafmtFileType)),
 
     coverageFailOnMinimum := false,

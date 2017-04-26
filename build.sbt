@@ -21,3 +21,7 @@ lazy val bench = jvmModule("bench")
   .dependsOn(coreJVM)
   .settings(noPublishSettings)
   .settings(libraryDependencies ++= Seq(%%("scheckShapeless")))
+
+pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
+pgpPublicRing := file(s"$gpgFolder/pubring.asc")
+pgpSecretRing := file(s"$gpgFolder/secring.asc")
