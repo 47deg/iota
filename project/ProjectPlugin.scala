@@ -6,9 +6,7 @@ import sbtorgpolicies.OrgPoliciesPlugin
 import sbtorgpolicies.OrgPoliciesPlugin.autoImport._
 import sbtorgpolicies.templates.badges._
 import sbtorgpolicies.templates._
-import sbtorgpolicies.runnable.SetSetting
 import sbtorgpolicies.runnable.syntax._
-import scoverage.ScoverageKeys
 import scoverage.ScoverageKeys._
 import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
@@ -57,7 +55,7 @@ object ProjectPlugin extends AutoPlugin {
     )
   }
 
-  lazy val commandAliases: Seq[Def.Setting[_]] = addCommandAlias("tutReadme", ";project readme;tut")
+  lazy val commandAliases: Seq[Def.Setting[_]] = addCommandAlias("tutReadme", ";project readme;tut;project root")
 
   override def projectSettings: Seq[Def.Setting[_]] = commandAliases ++ Seq(
 
@@ -78,9 +76,9 @@ object ProjectPlugin extends AutoPlugin {
     orgSupportedScalaJSVersion := Some("0.6.15"),
     orgScriptTaskListSetting := List(
       orgValidateFiles.asRunnableItem,
-      (clean in Global).asRunnableItemFull,
-      (compile in Compile).asRunnableItemFull,
-      (test in Test).asRunnableItemFull,
+      "clean".asRunnableItemFull,
+      "compile".asRunnableItemFull,
+      "test".asRunnableItemFull,
       "tutReadme".asRunnableItem
     ),
     orgEnforcedFilesSetting ~= (_ filterNot (_ == ScalafmtFileType)),
