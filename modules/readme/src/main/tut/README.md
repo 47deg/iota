@@ -1,7 +1,13 @@
-### Iota
+
+[comment]: # (Start Badges)
+
 [![Build Status](https://api.travis-ci.org/47deg/iota.png?branch=master)](https://travis-ci.org/47deg/iota)
 
-### Introduction
+[comment]: # (End Badges)
+
+# Iota
+
+## Introduction
 
 Iota is a tiny framework for fast product and coproduct types.
 
@@ -24,7 +30,19 @@ type Foo = Cop[Int :: String :: Double :: TNil]
 type Bar[A] = CopK[Option ::: List ::: Seq ::: KNil, A]
 ```
 
-### Injection type classes
+## Installation
+
+To get started with SBT, simply add the following to your build.sbt file:
+
+[comment]: # (Start Replace)
+
+```scala
+libraryDependencies += "com.47deg" %% "iota" % "0.0.1"
+```
+
+[comment]: # (End Replace)
+
+## Injection type classes
 
 Iota provides injection type classes to make it easy to get values in
 and out of your coproducts.
@@ -75,7 +93,7 @@ processBar(bar1)
 processBar(bar2)
 ```
 
-### Fast Interpreters
+## Fast Interpreters
 
 If you have interpreters for individual algebras, it's easy to use
 Iota create a fast fan in interpreter for the coproduct of your
@@ -139,12 +157,19 @@ import iota.debug.options.ShowTrees
 CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
 ```
 
-### Free
+## Free
 
 A `Free` example is available [in the tests][free example].
 
-### License
-The license can be found in [COPYING].
+## Iota in the wild
 
-[COPYING]: COPYING
-[free example]: modules/core/src/test/scala/iotatests/FreeCopKTests.scala
+If you wish to add your library here please consider a PR to include it in the list below.
+
+[comment]: # (Start Copyright)
+# Copyright
+
+Iota is designed and developed by 47 Degrees
+
+Copyright (C) 2016-2017 47 Degrees. <http://47deg.com>
+
+[comment]: # (End Copyright)

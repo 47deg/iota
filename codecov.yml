@@ -1,0 +1,10 @@
+codecov:
+  bot: 47degdev
+comment:
+  layout: header, changes, diff
+coverage:
+  ignore:
+    - modules/bench/*
+    - modules/readme/*
+  status:
+    patch: false

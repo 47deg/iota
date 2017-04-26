@@ -1,5 +1,17 @@
-/* -
- * Iota [iota-bench]
+/*
+ * Copyright 2016-2017 47 Degrees, LLC. <http://www.47deg.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package iota_bench
@@ -8,7 +20,7 @@ import iota._
 
 import cats._
 import cats.arrow.FunctionK
-import cats.data.{ State => _, _}
+import cats.data.{State => _, _}
 import cats.free._
 
 import org.scalacheck._
@@ -23,14 +35,14 @@ sealed abstract class InjK[F[_], G[_]] {
 
 object InjK {
   implicit def injKFromCatsInject[F[_], G[_]](
-    implicit ev: Inject[F, G]
+      implicit ev: Inject[F, G]
   ): InjK[F, G] = new InjK[F, G] {
     def inj = λ[F ~> G](ev.inj(_))
     def prj = λ[G ~> λ[α => Option[F[α]]]](ev.prj(_))
   }
 
   implicit def injKfromCopKInj[F[_], L <: KList](
-    implicit ev: CopK.InjectL[F, L]
+      implicit ev: CopK.InjectL[F, L]
   ): InjK[F, CopK[L, ?]] = new InjK[F, CopK[L, ?]] {
     def inj = λ[F ~> CopK[L, ?]](ev.inj(_))
     def prj = λ[CopK[L, ?] ~> λ[α => Option[F[α]]]](ev.proj(_))
@@ -83,8 +95,10 @@ object Iota {
   val evalA: AlgebraA ~> Id = CopK.FunctionK.of(AOp.eval)
   val evalB: AlgebraB ~> Id = CopK.FunctionK.of(AOp.eval, BOp.eval)
   val evalC: AlgebraC ~> Id = CopK.FunctionK.of(AOp.eval, BOp.eval, COp.eval)
-  val evalD: AlgebraD ~> Id = CopK.FunctionK.of(AOp.eval, BOp.eval, COp.eval, DOp.eval)
-  val evalE: AlgebraE ~> Id = CopK.FunctionK.of(AOp.eval, BOp.eval, COp.eval, DOp.eval, EOp.eval)
+  val evalD: AlgebraD ~> Id =
+    CopK.FunctionK.of(AOp.eval, BOp.eval, COp.eval, DOp.eval)
+  val evalE: AlgebraE ~> Id =
+    CopK.FunctionK.of(AOp.eval, BOp.eval, COp.eval, DOp.eval, EOp.eval)
 
   private[this] implicit class InjGenOps[F[_]](gf: Gen[F[_]]) {
     def inj[G[_]](implicit ev: InjK[F, G]): Gen[G[_]] = gf.map(f => ev(f))
@@ -131,7 +145,7 @@ class Bench {
   @Benchmark def catsEvalC: Id[_] = Cats.evalC(Cats.genAlgebraC.sample.get)
   @Benchmark def catsEvalD: Id[_] = Cats.evalD(Cats.genAlgebraD.sample.get)
   @Benchmark def catsEvalE: Id[_] = Cats.evalE(Cats.genAlgebraE.sample.get)
-  */
+   */
 
   @Benchmark def iotaEvalA: Id[_] = Iota.evalA(Iota.genAlgebraA.sample.get)
   @Benchmark def iotaEvalB: Id[_] = Iota.evalB(Iota.genAlgebraB.sample.get)
@@ -188,7 +202,7 @@ object BenchCodeGen extends App {
   }
 
 }
-*/
+ */
 
 package Ops {
 
