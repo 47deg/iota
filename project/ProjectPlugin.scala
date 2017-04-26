@@ -51,9 +51,9 @@ object ProjectPlugin extends AutoPlugin {
 
     lazy val readmeSettings: Seq[Def.Setting[_]] = tutSettings ++ Seq(
       tutScalacOptions := Nil,
-      tutSourceDirectory := (baseDirectory in LocalRootProject).value,
-      tutTargetDirectory := (baseDirectory in LocalRootProject).value,
-      tutNameFilter := """README.md""".r
+      tutSourceDirectory :=
+        (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
+      tutTargetDirectory := baseDirectory.value.getParentFile.getParentFile
     )
   }
 
