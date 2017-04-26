@@ -1,10 +1,11 @@
-# Iota
 
 [comment]: # (Start Badges)
 
 [![Build Status](https://api.travis-ci.org/47deg/iota.png?branch=master)](https://travis-ci.org/47deg/iota)
 
 [comment]: # (End Badges)
+
+# Iota
 
 ## Introduction
 
@@ -112,6 +113,8 @@ You can ask Iota to create a fan in interpreter by explicitly
 passing in individual interpreters for your algebras. Alternatively,
 Iota can implicitly summon the requisite interpreters based off the
 type signature of your desired interpreter.
+
+
 
 
 ```scala
