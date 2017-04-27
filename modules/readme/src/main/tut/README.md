@@ -1,7 +1,7 @@
 
 [comment]: # (Start Badges)
 
-[![Build Status](https://api.travis-ci.org/47deg/iota.png?branch=master)](https://travis-ci.org/47deg/iota)
+[![Build Status](https://travis-ci.org/47deg/iota.svg?branch=master)](https://travis-ci.org/47deg/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.0.1-green.svg)](https://oss.sonatype.org/#nexus-search;gav~com.47deg~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/47deg/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.0.1-green.svg)](https://index.scala-lang.org/47deg/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.15.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/47deg/iota.svg)](https://github.com/47deg/iota/issues)
 
 [comment]: # (End Badges)
 
