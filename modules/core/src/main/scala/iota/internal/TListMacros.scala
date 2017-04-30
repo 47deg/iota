@@ -44,7 +44,7 @@ class TListMacros(val c: Context) {
 
     result(for {
       algebras <- tlistTypesCached(L)
-      index    <- Right(algebras.indexWhere(_.dealias == A))
+      index    <- Right(algebras.indexWhere(_ =:= A))
                     .filterOrElse(_ >= 0, s"$A is not a member of $L")
     } yield
       q"new _root_.iota.TList.Pos[$L, $A]{ override val index: Int = $index }")

@@ -42,7 +42,7 @@ class KListMacros(val c: Context) {
 
     result(for {
       algebras <- klists.klistTypesCached(L)
-      index    <- Right(algebras.indexWhere(_.dealias == F))
+      index    <- Right(algebras.indexWhere(_ =:= F))
                     .filterOrElse(_ >= 0, s"$F is not a member of $L")
     } yield
       q"new _root_.iota.KList.Pos[$L, $F]{ override val index: Int = $index }")

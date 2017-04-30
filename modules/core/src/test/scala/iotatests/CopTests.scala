@@ -34,6 +34,11 @@ object CopTests extends Properties("CopTests") {
   type OneTwoThreeL = One :: Two :: Three :: TNil
   type ThreeTwoOneL = Three :: Two :: One :: TNil
 
+  // these just need to compile
+  Cop.InjectL[One, OneTwoThreeL]
+  Cop.InjectL[CopTests.One, OneTwoThreeL]
+  Cop.InjectL[_root_.iotatests.CopTests.One, OneTwoThreeL]
+
   def checkInjectL[A, L <: TList](
     gen: Gen[A],
     inj: Cop.InjectL[A, L],

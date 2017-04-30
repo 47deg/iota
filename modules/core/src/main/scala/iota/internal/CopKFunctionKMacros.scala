@@ -24,7 +24,7 @@ import cats.instances.all._
 import scala.reflect.macros.whitebox.Context
 import scala.reflect.macros.TypecheckException
 
-final class CopKFunctionKMacros( val c: Context) {
+final class CopKFunctionKMacros(val c: Context) {
   import c.universe._
 
   private[this] lazy val klists = new SharedKListMacros[c.type](c)

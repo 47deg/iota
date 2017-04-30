@@ -42,8 +42,13 @@ object CopKTests extends Properties("CopKTests") {
     case class Value(a: Int) extends Three[Int]
   }
 
-  type OneTwoThree = One :: Two :: Three :: KNil
-  type ThreeTwoOne = Three :: Two :: One :: KNil
+  type OneTwoThreeL = One :: Two :: Three :: KNil
+  type ThreeTwoOneL = Three :: Two :: One :: KNil
+
+  // these just need to compile
+  CopK.InjectL[One, OneTwoThreeL]
+  CopK.InjectL[CopKTests.One, OneTwoThreeL]
+  CopK.InjectL[_root_.iotatests.CopKTests.One, OneTwoThreeL]
 
   def checkInjectL[F[_], L <: KList, A](
     gen: Gen[F[A]],
@@ -53,43 +58,43 @@ object CopKTests extends Properties("CopKTests") {
     forAll(gen)(v =>
       inj.inj(v) ?= CopK(index, v))
 
-  property("inject One into OneTwoThree") =
+  property("inject One into OneTwoThreeL") =
     checkInjectL(
       arbitrary[One.Value],
-      CopK.InjectL[One, OneTwoThree],
+      CopK.InjectL[One, OneTwoThreeL],
       0)
 
-  property("inject Two into OneTwoThree") =
+  property("inject Two into OneTwoThreeL") =
     checkInjectL(
       arbitrary[Two.Value],
-      CopK.InjectL[Two, OneTwoThree],
+      CopK.InjectL[Two, OneTwoThreeL],
       1)
 
-  property("inject Three into OneTwoThree") =
+  property("inject Three into OneTwoThreeL") =
     checkInjectL(
       arbitrary[Three.Value],
-      CopK.InjectL[Three, OneTwoThree],
+      CopK.InjectL[Three, OneTwoThreeL],
       2)
 
-  property("inject One into ThreeTwoOne") =
+  property("inject One into ThreeTwoOneL") =
     checkInjectL(
       arbitrary[One.Value],
-      CopK.InjectL[One, ThreeTwoOne],
+      CopK.InjectL[One, ThreeTwoOneL],
       2)
 
-  property("inject Two into ThreeTwoOne") =
+  property("inject Two into ThreeTwoOneL") =
     checkInjectL(
       arbitrary[Two.Value],
-      CopK.InjectL[Two, ThreeTwoOne],
+      CopK.InjectL[Two, ThreeTwoOneL],
       1)
 
-  property("inject Three into ThreeTwoOne") =
+  property("inject Three into ThreeTwoOneL") =
     checkInjectL(
       arbitrary[Three.Value],
-      CopK.InjectL[Three, ThreeTwoOne],
+      CopK.InjectL[Three, ThreeTwoOneL],
       0)
 
-  type First[A] = A
+  type First[A] = String
   type Last[A] = A
   type Y[A]
 
