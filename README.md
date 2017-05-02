@@ -207,6 +207,10 @@ A `Free` example is available [in the tests][free example].
 
 If you wish to add your library here please consider a PR to include it in the list below.
 
+★ | ★ | ★
+--- | --- | ---
+![Freestyle](http://frees.io/img/navbar_brand.png) | [**Freestyle**](http://frees.io) | A cohesive & pragmatic framework of FP centric Scala libraries
+
 [comment]: # (Start Copyright)
 # Copyright
 
