@@ -158,7 +158,7 @@ val evalAlgebra2: Algebra ~> Future = CopK.FunctionK.summon
 ```
 
 The interpreters created by Iota are optimized for speed and have a
-constant evalaluation time. Behind the scenes, a macro generates an
+constant evaluation time. Behind the scenes, a macro generates an
 integer based switch statement on the coproduct's internal index value.
 
 If you'd like to see the generated code, toggle the "show trees" option by
