@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Nunito", Helvetica, Arial;
+}
+
+.line {
+  fill: none;
+  stroke-linejoin: "round";
+  stroke-linecap: "round";
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
+.ring {
+  stroke-width: 1;
+  fill        : none;
+  r           : 4px;
+  opacity     : 0.23;
+}
+
+.dot {
+  r: 1.5px;
+  opacity : 0.77;
+}
+
+.cats circle.ring {
+  stroke: steelblue;
+}
+
+.cats circle.dot {
+  fill: steelblue;
+}
+
+.cats path {
+  stroke: steelblue;
+}
+
+.iota circle.ring {
+  stroke: green;
+}
+
+.iota circle.dot {
+  fill        : green;
+}
+
+.iota path {
+  stroke: green;
+}
+
+
+</style>
+<svg class="bench" width="960" height="500"></svg>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/1.14.0/d3-annotation.min.css">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/1.14.0/d3-annotation.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 45, left: 60},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+var x = d3.scaleLinear().rangeRound([0, width]);
+var y = d3.scaleLinear().rangeRound([height, 0]);
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var gIota = g.append("g").attr("class", "iota")
+var gCats = g.append("g").attr("class", "cats")
+
+d3.json("plot.json", function(error, rawData) {
+
+    var data = rawData.sort(function(a, b) { return a.n - b.n })
+        .filter(function(d) { return d.n <= 40 });
+    var catsData = data.filter(function(d) { return d.impl == "cats" })
+    var iotaData = data.filter(function(d) { return d.impl == "iota" })
+
+    var minY = d3.min(data, function(d) { return d.score.value; });
+    var maxY = d3.max(data, function(d) { return d.score.value; });
+    var maxX = d3.max(data, function(d) { return d.n });
+
+    var nTicksX = 10;
+    var xHalfY = catsData.findIndex(function(d) { return d.score.value * 2 < maxY; })
+
+    x.domain([0, maxX]);
+    y.domain([0, maxY * 1.1]);
+
+    g.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(nTicksX))
+
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margin.top + margin.bottom - 5)
+        .style("text-anchor", "middle")
+        .text("number of algebras");
+
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("score (1000 ops/s)");
+
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).tickFormat(function (d) {
+            return d / 1000;
+        }))
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("score");
+
+    const line = d3.line()
+        .curve(d3.curveBasis)
+        .x(function(d) { return x(d.n); })
+        .y(function(d) { return y(d.score.value); });
+
+    const cats = gCats.selectAll("g")
+        .data(catsData)
+        .enter()
+        .append("g")
+        .attr("transform", function(d) { return "translate(" + x(d.n) + "," + y(d.score.value) + ")" })
+
+    cats.append("circle").attr("class", "ring")
+    cats.append("circle").attr("class", "dot")
+
+    gCats.append("path").attr("class", "line")
+         .datum(catsData)
+         .attr("d", line);
+
+
+    const iota = gIota.selectAll("g")
+        .data(iotaData)
+        .enter()
+        .append("g")
+        .attr("transform", function(d) { return "translate(" + x(d.n) + "," + y(d.score.value) + ")" })
+
+    iota.append("circle").attr("class", "ring")
+    iota.append("circle").attr("class", "dot")
+
+    gIota.append("path").attr("class", "line")
+         .datum(iotaData)
+         .attr("d", line);
+
+    const annotations = [
+    {
+        note: {
+            title: "17 algebras",
+            label: "cats overhead doubles"
+        },
+        data: catsData[xHalfY],
+        dy: 60,
+        dx: -100,
+        type: d3.annotationCalloutCircle,
+        connector: { end: "none" },
+        subject: { radius: 20, radiusPadding: 5 }
+    }, {
+        note: {
+            title: "doof",
+            //label: "cats overhead doubles",
+            align: "middle"
+        },
+        data: iotaData[25],
+        dy: 60,
+        dx: 100,
+        type: d3.annotationXYThreshold,
+        subject: { x1: x(20), x2: x(30) }
+    }];
+
+    function makeAnnotations() { return d3.annotation()
+        .editMode(false)
+        .accessors({
+            x: d => x(d.n),
+            y: d => y(d.score.value)
+        })
+        .accessorsInverse({
+            date: d => x.invert(d.x),
+            close: d => y.invert(d.y)
+        })
+    };
+
+    g.append("g")
+        .call(makeAnnotations().annotations([{
+            note: {
+                title: xHalfY + " algebras",
+                label: "cats overhead doubles"
+            },
+            data: catsData[xHalfY],
+            dy: 60,
+            dx: -100,
+            type: d3.annotationCalloutCircle,
+            connector: { end: "none" },
+            subject: { radius: 20, radiusPadding: 5 }
+        }]));
+
+    g.append("g")
+        .attr("transform", "translate(0, 13)")
+        .call(makeAnnotations().annotations([{
+            note: {
+                label: "constant iota overhead"
+            },
+            data: iotaData[25],
+            dy: 60,
+            dx: 100,
+            type: d3.annotationLabel
+        }]));
+
+});
+
+</script>
