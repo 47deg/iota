@@ -9,14 +9,29 @@
 
 ## Introduction
 
-Iota is a tiny framework for fast product and coproduct types.
+Iota is a tiny library for fast coproduct types with a syntax
+that cleanly supports the disjunction of any number of types.
 
-Unlike many coproduct implementations that use a linked list at the
-value level, Iota stores indexes for coproduct values to allow for
-quick access.
+Traditional coproduct implementations are implemented as binary trees
+or linked lists at both the type and value level. The syntax for
+traditional coproducts frequently becomes unwieldy as the number of
+disjunct types grows.
 
-At the type level, Iota uses a linked list type with a binary type
-operator for a simple syntax.
+```tut:silent
+import cats.data._
+
+// a coproduct of types using scala.util.Either
+type EitherFoo = Either[Int, Either[String, Double]]
+
+// a coproduct of type constructors using cats.data.Coproduct
+type CoproductBar0[A] = Coproduct[List, Seq, A]
+type CoproductBar[A] = Coproduct[Option, CoproductBar0, A]
+```
+
+Iota coproducts are linked lists at the type level. At the value level,
+Iota stores the index of the disjunct value's type for quick and
+constant time access of the values. This syntax scales cleanly to
+support any number of disjunct types.
 
 ```tut:silent
 import iota._

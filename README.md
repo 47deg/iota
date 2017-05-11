@@ -1,7 +1,7 @@
 
 [comment]: # (Start Badges)
 
-[![Build Status](https://travis-ci.org/47deg/iota.svg?branch=master)](https://travis-ci.org/47deg/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.0.2-green.svg)](https://oss.sonatype.org/#nexus-search;gav~com.47deg~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/47deg/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.0.2-green.svg)](https://index.scala-lang.org/47deg/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.15.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/47deg/iota.svg)](https://github.com/47deg/iota/issues)
+[![Build Status](https://travis-ci.org/47deg/iota.svg?branch=master)](https://travis-ci.org/47deg/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.0.1-green.svg)](https://oss.sonatype.org/#nexus-search;gav~com.47deg~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/47deg/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.0.1-green.svg)](https://index.scala-lang.org/47deg/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.15.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/47deg/iota.svg)](https://github.com/47deg/iota/issues)
 
 [comment]: # (End Badges)
 
@@ -9,14 +9,29 @@
 
 ## Introduction
 
-Iota is a tiny framework for fast product and coproduct types.
+Iota is a tiny library for fast coproduct types with a syntax
+that cleanly supports the disjunction of any number of types.
 
-Unlike many coproduct implementations that use a linked list at the
-value level, Iota stores indexes for coproduct values to allow for
-quick access.
+Traditional coproduct implementations are implemented as binary trees
+or linked lists at both the type and value level. The syntax for
+traditional coproducts frequently becomes unwieldy as the number of
+disjunct types grows.
 
-At the type level, Iota uses a linked list type with a binary type
-operator for a simple syntax.
+```scala
+import cats.data._
+
+// a coproduct of types using scala.util.Either
+type EitherFoo = Either[Int, Either[String, Double]]
+
+// a coproduct of type constructors using cats.data.Coproduct
+type CoproductBar0[A] = Coproduct[List, Seq, A]
+type CoproductBar[A] = Coproduct[Option, CoproductBar0, A]
+```
+
+Iota coproducts are linked lists at the type level. At the value level,
+Iota stores the index of the disjunct value's type for quick and
+constant time access of the values. This syntax scales cleanly to
+support any number of disjunct types.
 
 ```scala
 import iota._
@@ -74,13 +89,13 @@ val foo2: Foo = DoubleFoo.inj(47.6062)
 ```
 ```scala
 processFoo(foo0)
-// res6: String = int: 100
+// res10: String = int: 100
 
 processFoo(foo1)
-// res7: String = string: hello world
+// res11: String = string: hello world
 
 processFoo(foo2)
-// res8: String = double: 47.6062
+// res12: String = double: 47.6062
 ```
 
 *coproduct of type constructors*
@@ -102,13 +117,13 @@ val bar2: Bar[String] = SeqBar.inj(Seq("a", "b", "c"))
 ```
 ```scala
 processBar(bar0)
-// res11: String = option: Some(200)
+// res15: String = option: Some(200)
 
 processBar(bar1)
-// res12: String = list: List(hello, world)
+// res16: String = list: List(hello, world)
 
 processBar(bar2)
-// res13: String = seq: List(a, b, c)
+// res17: String = seq: List(a, b, c)
 ```
 
 ## Fast Interpreters
@@ -158,7 +173,7 @@ val evalAlgebra2: Algebra ~> Future = CopK.FunctionK.summon
 ```
 
 The interpreters created by Iota are optimized for speed and have a
-constant evaluation time. Behind the scenes, a macro generates an
+constant evalaluation time. Behind the scenes, a macro generates an
 integer based switch statement on the coproduct's internal index value.
 
 If you'd like to see the generated code, toggle the "show trees" option by
@@ -169,20 +184,7 @@ import iota.debug.options.ShowTrees
 // import iota.debug.options.ShowTrees
 
 CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
-// <console>:30: generated tree:
-// {
-//   final class $anon extends _root_.iota.CopKFunctionK[Algebra, Future] {
-//     private[this] val arr0 = evalUserOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, Future]];
-//     private[this] val arr1 = evalOrderOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, Future]];
-//     private[this] val arr2 = evalPriceOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, Future]];
-//     override def apply[A](ca: Algebra[A]): Future[A] = (ca.index: @_root_.scala.annotation.switch) match {
-//       case 0 => arr0(ca.value)
-//       case 1 => arr1(ca.value)
-//       case 2 => arr2(ca.value)
-//       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds for ").+(this))
-//     };
-//     override def toString: String = "CopKFunctio...
-// res28: iota.CopKFunctionK[Algebra,scala.concurrent.Future] = CopKFunctionK[Algebra, Future]<<generated>>
+// res32: iota.CopKFunctionK[Algebra,scala.concurrent.Future] = CopKFunctionK[Algebra, scala.concurrent.Future]<<generated>>
 ```
 
 #### Is it actually faster?
@@ -206,10 +208,6 @@ A `Free` example is available [in the tests][free example].
 ## Iota in the wild
 
 If you wish to add your library here please consider a PR to include it in the list below.
-
-★ | ★ | ★
---- | --- | ---
-![Freestyle](http://frees.io/img/navbar_brand.png) | [**Freestyle**](http://frees.io) | A cohesive & pragmatic framework of FP centric Scala libraries
 
 [comment]: # (Start Copyright)
 # Copyright
