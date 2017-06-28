@@ -93,12 +93,20 @@ private[internal] sealed trait TypeListTrees { self: Toolbelt =>
   import u._
 
   sealed trait NodeF  [+A]
-  case class   ConsF   [A](head: Type, tail: A) extends NodeF[A]
+  case class   ConsF   [A](head: Type, tail: A) extends NodeF[A] with ConsFEquality
   case class   ConcatF [A](nodes: List[A])      extends NodeF[A]
   case class   ReverseF[A](node: A)             extends NodeF[A]
   case class   TakeF   [A](n: Int, node: A)     extends NodeF[A]
   case class   DropF   [A](n: Int, node: A)     extends NodeF[A]
   case object  NNilF                            extends NodeF[Nothing]
+
+  sealed trait ConsFEquality { self: ConsF[_] =>
+    override def equals(that: Any): Boolean = that match {
+      case that: ConsF[_] => that.canEqual(this) &&
+        this.head =:= that.head && this.tail == that.tail
+      case _ => false
+    }
+  }
 
   object NodeF {
     implicit val nodeTraverse: Traverse[NodeF] = new Traverse[NodeF] {
