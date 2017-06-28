@@ -269,22 +269,33 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
     sym.asType.toType.etaExpand.resultType
 
   final def destructCop(tpe: Type): Either[Id[String], CopTypes] =
-    tpe.dealias match {
+    tpe.dealias.resultType match {
       case TypeRef(_, sym, l :: Nil) if resultType(sym) <:< CopTpe => Right(CopTypes(l))
       case TypeRef(_, sym, Nil) => destructCop(sym.asType.toType)
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring Cop $tpe")
     }
 
   final def destructCopK(tpe: Type): Either[Id[String], CopKTypes] =
-    tpe.dealias match {
+    tpe.dealias.resultType match {
       case TypeRef(_, sym, l :: a :: Nil) if resultType(sym) <:< CopKTpe => Right(CopKTypes(l, a))
       case TypeRef(_, sym, Nil) => destructCopK(sym.asType.toType)
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring CopK $tpe")
     }
 
-  private[this] def toSymbol(tpe: Type): Symbol = tpe match {
-    case TypeRef(_, sym, Nil) => sym
-    case _                    => tpe.typeSymbol
+  private[this] final def projectPoly(tpe: PolyType, lambdaName: TypeName = TypeName("ξ$")): Tree = {
+    SelectFromTypeTree(CompoundTypeTree(
+      Template(
+        q"_root_.scala.AnyRef" :: Nil,
+        ValDef(NoMods, termNames.WILDCARD, TypeTree(), EmptyTree),
+        TypeDef(NoMods, lambdaName, tpe.typeParams.map(internal.typeDef(_)),
+          q"${tpe.resultType}") :: Nil)),
+      lambdaName)
+  }
+
+  private[this] final def toTypeTree(tpe: Type): Tree = tpe match {
+    case poly: PolyType       => projectPoly(poly)
+    case TypeRef(_, sym, Nil) => Ident(sym.name)
+    case _                    => Ident(tpe.typeSymbol.name)
   }
 
   final def defineFastFunctionK(
@@ -295,16 +306,21 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
     handlers: List[TermName => Tree]
   ): Tree = {
 
+    val A  = TypeName("Ξ$")
     val fa = TermName("fa")
-    val A  = TypeName("Ξ")
+    val FF = toTypeTree(F)
+    val GG = toTypeTree(G)
+    val FA = AppliedTypeTree(FF, Ident(A) :: Nil)
+    val GA = AppliedTypeTree(GG, Ident(A) :: Nil)
+
     val cases = handlers.zipWithIndex
       .map { case (h, i) => cq"$i => ${h(fa)}" }
     val toStringValue = s"FastFunctionK[$F, $G]<<generated>>"
 
     q"""
-    class $className extends _root_.iota.internal.FastFunctionK[$F, $G] {
+    class $className extends _root_.iota.internal.FastFunctionK[$FF, $GG] {
       ..$preamble
-      override def apply[$A]($fa: ${toSymbol(F)}[$A]): ${toSymbol(G)}[$A] =
+      override def apply[$A]($fa: $FA): $GA =
         (${toIndex(fa)}: @_root_.scala.annotation.switch) match {
           case ..$cases
           case i => throw new _root_.java.lang.Exception(
