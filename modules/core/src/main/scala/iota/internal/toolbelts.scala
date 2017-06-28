@@ -160,10 +160,10 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
           case ReverseSym => ReverseF(args(0)).asRight
           case TakeSym    => literalInt(args(0)).map(TakeF(_, args(1)))
           case DropSym    => literalInt(args(0)).map(DropF(_, args(1)))
-          case sym        => s"Unexpected symbol $sym for type $tpe".asLeft
+          case sym        => s"Unexpected symbol $sym for type $tpe: ${showRaw(tpe)}".asLeft
         }
       case ExistentialType(_, res) => loop(res) // the irony...
-      case _ => s"Unable to parse type $tpe".asLeft
+      case _ => s"Unable to parse type $tpe: ${showRaw(tpe)}".asLeft
     }
     loop(tpe0)
   }
