@@ -68,12 +68,6 @@ object Cop {
       else None
     def apply(a: A): Cop[L] = inj(a)
     def unapply(c: Cop[L]): Option[A] = proj(c)
-
-    def fold(c: Cop[L]): Either[Cop[TList.Op.Remove[A, L]], A] =
-      Either.cond(
-        c.index == index,
-        c.value.asInstanceOf[A],
-        new Cop(if (c.index < index) c.index else c.index - 1, c.value))
   }
 
   object InjectL {
@@ -81,4 +75,19 @@ object Cop {
     implicit def makeInjectL[A, L <: TList](implicit ev: TList.Pos[L, A]): InjectL[A, L] =
       new InjectL[A, L](ev.index)
   }
+
+  final class RemoveL[A, L <: TList] private[RemoveL](index: Int) {
+    def apply(c: Cop[L]): Either[Cop[TList.Op.Remove[A, L]], A] =
+      Either.cond(
+        c.index == index,
+        c.value.asInstanceOf[A],
+        new Cop(if (c.index < index) c.index else c.index - 1, c.value))
+  }
+
+  object RemoveL {
+    def apply[A, L <: TList](implicit ev: RemoveL[A, L]): RemoveL[A, L] = ev
+    implicit def makeRemoveL[A, L <: TList](implicit ev: TList.Pos[L, A]): RemoveL[A, L] =
+      new RemoveL[A, L](ev.index)
+  }
+
 }
