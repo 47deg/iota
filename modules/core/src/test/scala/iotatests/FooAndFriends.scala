@@ -23,8 +23,8 @@ object FooAndFriends {
   import TList.::
 
   trait Foo
-  trait Bar
-  trait Baz
+  type Bar = String
+  type Baz = Long with ("t", "t", "o", "c", "s")
 
   type FooBarBazL = Foo :: Bar :: Baz :: TNil
   type BazBarFooL = Baz :: Bar :: Foo :: TNil
@@ -36,8 +36,8 @@ object FooAndFriends {
   import KList.:::
 
   trait FooK[A]
-  trait BarK[A]
-  trait BazK[A]
+  type BarK[A] = cats.data.NonEmptyList[A]
+  type BazK[A] = Option[String with A] // ¯\_(ツ)_/¯
 
   type FooBarBazKL = FooK ::: BarK ::: BazK ::: KNil
   type BazBarFooKL = BazK ::: BarK ::: FooK ::: KNil

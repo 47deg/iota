@@ -93,13 +93,21 @@ private[internal] sealed trait TypeListTrees { self: Toolbelt =>
   import u._
 
   sealed trait NodeF  [+A]
-  case class   ConsF   [A](head: Type, tail: A) extends NodeF[A]
+  case class   ConsF   [A](head: Type, tail: A) extends NodeF[A] with ConsFEquality
   case class   ConcatF [A](nodes: List[A])      extends NodeF[A]
   case class   ReverseF[A](node: A)             extends NodeF[A]
   case class   TakeF   [A](n: Int, node: A)     extends NodeF[A]
   case class   DropF   [A](n: Int, node: A)     extends NodeF[A]
   case class   RemoveF [A](t: Type, nodes: A)   extends NodeF[A]
   case object  NNilF                            extends NodeF[Nothing]
+
+  sealed trait ConsFEquality { self: ConsF[_] =>
+    override def equals(that: Any): Boolean = that match {
+      case that: ConsF[_] => that.canEqual(this) &&
+        this.head =:= that.head && this.tail == that.tail
+      case _ => false
+    }
+  }
 
   object NodeF {
     implicit val nodeTraverse: Traverse[NodeF] = new Traverse[NodeF] {
@@ -166,10 +174,10 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
           case TakeSym    => literalInt(args(0)).map(TakeF(_, args(1)))
           case DropSym    => literalInt(args(0)).map(DropF(_, args(1)))
           case RemoveSym  => RemoveF(args(0), args(1)).asRight
-          case sym        => s"Unexpected symbol $sym for type $tpe".asLeft
+          case sym        => s"Unexpected symbol $sym for type $tpe: ${showRaw(tpe)}".asLeft
         }
       case ExistentialType(_, res) => loop(res) // the irony...
-      case _ => s"Unable to parse type $tpe".asLeft
+      case _ => s"Unable to parse type $tpe: ${showRaw(tpe)}".asLeft
     }
     loop(tpe0)
   }
@@ -275,22 +283,33 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
     sym.asType.toType.etaExpand.resultType
 
   final def destructCop(tpe: Type): Either[Id[String], CopTypes] =
-    tpe.dealias match {
+    tpe.dealias.resultType match {
       case TypeRef(_, sym, l :: Nil) if resultType(sym) <:< CopTpe => Right(CopTypes(l))
       case TypeRef(_, sym, Nil) => destructCop(sym.asType.toType)
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring Cop $tpe")
     }
 
   final def destructCopK(tpe: Type): Either[Id[String], CopKTypes] =
-    tpe.dealias match {
+    tpe.dealias.resultType match {
       case TypeRef(_, sym, l :: a :: Nil) if resultType(sym) <:< CopKTpe => Right(CopKTypes(l, a))
       case TypeRef(_, sym, Nil) => destructCopK(sym.asType.toType)
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring CopK $tpe")
     }
 
-  private[this] def toSymbol(tpe: Type): Symbol = tpe match {
-    case TypeRef(_, sym, Nil) => sym
-    case _                    => tpe.typeSymbol
+  private[this] final def projectPoly(tpe: PolyType, lambdaName: TypeName = TypeName("ξ$")): Tree = {
+    SelectFromTypeTree(CompoundTypeTree(
+      Template(
+        q"_root_.scala.AnyRef" :: Nil,
+        ValDef(NoMods, termNames.WILDCARD, TypeTree(), EmptyTree),
+        TypeDef(NoMods, lambdaName, tpe.typeParams.map(internal.typeDef(_)),
+          q"${tpe.resultType}") :: Nil)),
+      lambdaName)
+  }
+
+  private[this] final def toTypeTree(tpe: Type): Tree = tpe match {
+    case poly: PolyType       => projectPoly(poly)
+    case TypeRef(_, sym, Nil) => Ident(sym.name)
+    case _                    => Ident(tpe.typeSymbol.name)
   }
 
   final def defineFastFunctionK(
@@ -301,16 +320,21 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
     handlers: List[TermName => Tree]
   ): Tree = {
 
+    val A  = TypeName("Ξ$")
     val fa = TermName("fa")
-    val A  = TypeName("Ξ")
+    val FF = toTypeTree(F)
+    val GG = toTypeTree(G)
+    val FA = AppliedTypeTree(FF, Ident(A) :: Nil)
+    val GA = AppliedTypeTree(GG, Ident(A) :: Nil)
+
     val cases = handlers.zipWithIndex
       .map { case (h, i) => cq"$i => ${h(fa)}" }
     val toStringValue = s"FastFunctionK[$F, $G]<<generated>>"
 
     q"""
-    class $className extends _root_.iota.internal.FastFunctionK[$F, $G] {
+    class $className extends _root_.iota.internal.FastFunctionK[$FF, $GG] {
       ..$preamble
-      override def apply[$A]($fa: ${toSymbol(F)}[$A]): ${toSymbol(G)}[$A] =
+      override def apply[$A]($fa: $FA): $GA =
         (${toIndex(fa)}: @_root_.scala.annotation.switch) match {
           case ..$cases
           case i => throw new _root_.java.lang.Exception(
