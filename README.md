@@ -185,15 +185,15 @@ import iota.debug.options.ShowTrees
 
 CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
 // <console>:33: {
-//   class CopKFunctionK$macro$4 extends _root_.iota.internal.FastFunctionK[Algebra, scala.concurrent.Future] {
+//   class CopKFunctionK$macro$4 extends _root_.iota.internal.FastFunctionK[Algebra, Future] {
 //     private[this] val arr0 = evalUserOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
 //     private[this] val arr1 = evalOrderOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
 //     private[this] val arr2 = evalPriceOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
-//     override def apply[Ξ](fa: Algebra[Ξ]): Future[Ξ] = (fa.index: @_root_.scala.annotation.switch) match {
+//     override def apply[Ξ$](fa: Algebra[Ξ$]): Future[Ξ$] = (fa.index: @_root_.scala.annotation.switch) match {
 //       case 0 => arr0(fa.value)
 //       case 1 => arr1(fa.value)
 //       case 2 => arr2(fa.value)
-//       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds ...res32: iota.internal.FastFunctionK[Algebra,scala.concurrent.Future] = FastFunctionK[Algebra, scala.concurrent.Future]<<generated>>
+//       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds for ").+(this)...res32: iota.internal.FastFunctionK[Algebra,scala.concurrent.Future] = FastFunctionK[Algebra, scala.concurrent.Future]<<generated>>
 ```
 
 #### Is it actually faster?

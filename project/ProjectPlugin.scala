@@ -1,8 +1,8 @@
 import sbt.Keys._
 import sbt._
+import freestyle.FreestylePlugin
 import sbtorgpolicies.model._
 import sbtorgpolicies.OrgPoliciesKeys.orgBadgeListSetting
-import sbtorgpolicies.OrgPoliciesPlugin
 import sbtorgpolicies.OrgPoliciesPlugin.autoImport._
 import sbtorgpolicies.templates.badges._
 import sbtorgpolicies.templates._
@@ -16,7 +16,7 @@ object ProjectPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def requires: Plugins = OrgPoliciesPlugin
+  override def requires: Plugins = FreestylePlugin
 
   object autoImport {
 

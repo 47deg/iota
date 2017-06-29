@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .aggregate(examplesJVM, examplesJS)
   .aggregate(bench)
 
-lazy val core = module("core", true)
+lazy val core = module("core", hideFolder = true)
   .settings(scalaMacroDependencies)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     yaxScala = true))
@@ -22,6 +22,7 @@ lazy val coreJS  = core.js
 
 lazy val examples = module("examples")
   .dependsOn(core)
+  .settings(scalaMacroDependencies)
   .settings(noPublishSettings)
 
 lazy val examplesJVM = examples.jvm
@@ -37,6 +38,7 @@ lazy val bench = jvmModule("bench")
   .enablePlugins(JmhPlugin)
   .dependsOn(coreJVM)
   .configs(Codegen)
+  .settings(scalaMacroDependencies)
   .settings(inConfig(Codegen)(Defaults.configSettings))
   .settings(classpathConfiguration in Codegen := Compile)
   .settings(noPublishSettings)
@@ -45,7 +47,7 @@ lazy val bench = jvmModule("bench")
     %%("scalacheck")))
   .settings(inConfig(Compile)(
     sourceGenerators += Def.task {
-      val path = ((sourceManaged in (Compile, compile)).value / "bench.scala")
+      val path = (sourceManaged in(Compile, compile)).value / "bench.scala"
       (runner in (Codegen, run)).value.run(
         "iota.bench.BenchBoiler",
         Attributed.data((fullClasspath in Codegen).value),

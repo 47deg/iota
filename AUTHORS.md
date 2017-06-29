@@ -4,7 +4,7 @@
 
 The maintainers of the project are:
 
-* 47 Degrees (twitter: @47deg) <[47degdev](https://github.com/47degdev)>
+* 47 Degrees (twitter: @47deg) <[47degfreestyle](https://github.com/47degfreestyle)>
 * Andy Scott (twitter: [@andygscott](https://twitter.com/andygscott)) <[andyscott](https://github.com/andyscott)>
 
 ## Contributors
