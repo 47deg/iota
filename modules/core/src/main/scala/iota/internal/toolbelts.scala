@@ -98,39 +98,39 @@ private[internal] sealed trait TypeListTrees { self: Toolbelt =>
   case class   ReverseF[A](node: A)             extends NodeF[A]
   case class   TakeF   [A](n: Int, node: A)     extends NodeF[A]
   case class   DropF   [A](n: Int, node: A)     extends NodeF[A]
-  case class   WithoutF[A](t: Type, nodes: A)   extends NodeF[A]
+  case class   RemoveF [A](t: Type, nodes: A)   extends NodeF[A]
   case object  NNilF                            extends NodeF[Nothing]
 
   object NodeF {
     implicit val nodeTraverse: Traverse[NodeF] = new Traverse[NodeF] {
       def traverse[G[_], A, B](fa: NodeF[A])(f: A => G[B])(implicit G: Applicative[G]): G[NodeF[B]] = fa match {
-        case ConsF(hd, a)   => G.map(f(a))(ConsF(hd, _))
-        case ConcatF(as)    => G.map(Traverse[List].traverse(as)(f))(ConcatF(_))
-        case ReverseF(a)    => G.map(f(a))(ReverseF(_))
-        case TakeF(n, a)    => G.map(f(a))(TakeF(n, _))
-        case DropF(n, a)    => G.map(f(a))(DropF(n, _))
-        case WithoutF(t, a) => G.map(f(a))(WithoutF(t, _))
-        case NNilF          => G.pure(NNilF: NodeF[B])
+        case ConsF(hd, a)  => G.map(f(a))(ConsF(hd, _))
+        case ConcatF(as)   => G.map(Traverse[List].traverse(as)(f))(ConcatF(_))
+        case ReverseF(a)   => G.map(f(a))(ReverseF(_))
+        case TakeF(n, a)   => G.map(f(a))(TakeF(n, _))
+        case DropF(n, a)   => G.map(f(a))(DropF(n, _))
+        case RemoveF(t, a) => G.map(f(a))(RemoveF(t, _))
+        case NNilF         => G.pure(NNilF: NodeF[B])
       }
 
       def foldLeft[A, B](fa: NodeF[A], b: B)(f: (B, A) => B): B = fa match {
-        case ConsF(_, a)    => f(b, a)
-        case ConcatF(as)    => Foldable[List].foldLeft(as, b)(f)
-        case ReverseF(a)    => f(b, a)
-        case TakeF(_, a)    => f(b, a)
-        case DropF(_, a)    => f(b, a)
-        case WithoutF(_, a) => f(b, a)
-        case NNilF          => b
+        case ConsF(_, a)   => f(b, a)
+        case ConcatF(as)   => Foldable[List].foldLeft(as, b)(f)
+        case ReverseF(a)   => f(b, a)
+        case TakeF(_, a)   => f(b, a)
+        case DropF(_, a)   => f(b, a)
+        case RemoveF(_, a) => f(b, a)
+        case NNilF         => b
       }
 
       def foldRight[A, B](fa: NodeF[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = fa match {
-        case ConsF(_, a)    => f(a, lb)
-        case ConcatF(as)    => Foldable[List].foldRight(as, lb)(f)
-        case ReverseF(a)    => f(a, lb)
-        case TakeF(_, a)    => f(a, lb)
-        case DropF(_, a)    => f(a, lb)
-        case WithoutF(_, a) => f(a, lb)
-        case NNilF          => lb
+        case ConsF(_, a)   => f(a, lb)
+        case ConcatF(as)   => Foldable[List].foldRight(as, lb)(f)
+        case ReverseF(a)   => f(a, lb)
+        case TakeF(_, a)   => f(a, lb)
+        case DropF(_, a)   => f(a, lb)
+        case RemoveF(_, a) => f(a, lb)
+        case NNilF         => lb
       }
     }
   }
@@ -154,7 +154,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
     ReverseSym: Symbol,
     TakeSym   : Symbol,
     DropSym   : Symbol,
-    WithoutSym: Symbol
+    RemoveSym: Symbol
   ): Parser = tpe0 => {
     @tailrec def loop(tpe: Type): Either[Id[String], NodeF[Type]] = tpe.dealias match {
       case TypeRef(_, sym, args) =>
@@ -165,7 +165,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
           case ReverseSym => ReverseF(args(0)).asRight
           case TakeSym    => literalInt(args(0)).map(TakeF(_, args(1)))
           case DropSym    => literalInt(args(0)).map(DropF(_, args(1)))
-          case WithoutSym => WithoutF(args(0), args(1)).asRight
+          case RemoveSym  => RemoveF(args(0), args(1)).asRight
           case sym        => s"Unexpected symbol $sym for type $tpe".asLeft
         }
       case ExistentialType(_, res) => loop(res) // the irony...
@@ -183,7 +183,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
     ReverseSym = symbolOf[iota.TList.Op.Reverse[Nothing]],
     TakeSym    = symbolOf[iota.TList.Op.Take[Nothing, Nothing]],
     DropSym    = symbolOf[iota.TList.Op.Drop[Nothing, Nothing]],
-    WithoutSym = symbolOf[iota.TList.Op.Without[Nothing, Nothing]])
+    RemoveSym  = symbolOf[iota.TList.Op.Remove[Nothing, Nothing]])
 
   final lazy val klistParser: Parser = typeListParser(
     NilSym     = symbolOf[iota.KNil],
@@ -192,7 +192,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
     ReverseSym = symbolOf[iota.KList.Op.Reverse[Nothing]],
     TakeSym    = symbolOf[iota.KList.Op.Take[Nothing, Nothing]],
     DropSym    = symbolOf[iota.KList.Op.Drop[Nothing, Nothing]],
-    WithoutSym = symbolOf[iota.KList.Op.Without[Nothing, Nothing]])
+    RemoveSym  = symbolOf[iota.KList.Op.Remove[Nothing, Nothing]])
 }
 
 private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeListTrees with TypeListParsers =>
@@ -204,8 +204,13 @@ private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeList
     case ReverseF(types)    => types.reverse
     case TakeF(n, types)    => types.take(n)
     case DropF(n, types)    => types.drop(n)
-    case WithoutF(t, types) => types.filterNot(_ =:= t)
+    case RemoveF(t, types)  => removeFirst(types)(_ =:= t)
     case NNilF              => Nil
+  }
+
+  private[this] def removeFirst[T](list: List[T])(pred: T => Boolean): List[T] = {
+    val (before, atAndAfter) = list.span(!pred(_))
+    before ::: atAndAfter.drop(1)
   }
 
   final def tlistTypes(tpe: Type): Either[Id[String], List[Type]] =

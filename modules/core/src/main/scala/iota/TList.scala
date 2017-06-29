@@ -45,7 +45,7 @@ object TList {
     type Reverse[L <: TList]                    <: TList
     type Take   [N <: SingletonInt, L <: TList] <: TList
     type Drop   [N <: SingletonInt, L <: TList] <: TList
-    type Without[T, L <: TList]                 <: TList
+    type Remove [T, L <: TList]                 <: TList
   }
 
   trait Compute[L <: TList] {

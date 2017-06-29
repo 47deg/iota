@@ -68,6 +68,12 @@ object CopK {
       else None
     def apply[A](fa: F[A]): CopK[L, A] = inj(fa)
     def unapply[A](ca: CopK[L, A]): Option[F[A]] = proj(ca)
+
+    def projEither[A](c: CopK[L, A]): Either[CopK[KList.Op.Remove[F, L], A], F[A]] =
+      Either.cond(
+        c.index == index,
+        c.value.asInstanceOf[F[A]],
+        new CopK(if (c.index < index) c.index else c.index - 1, c.value))
   }
 
   object InjectL {

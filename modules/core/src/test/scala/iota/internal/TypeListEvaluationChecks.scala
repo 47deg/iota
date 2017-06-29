@@ -89,9 +89,10 @@ class TypeListEvaluationChecks(
     drop(2, cons[String](cons[Double]())) -> (Nil),
     drop(3, cons[String](cons[Double]())) -> (Nil),
 
-    without[Double](cons[Double](cons[String](cons[Int]()))) -> (t[String] :: t[Int] :: Nil),
-    without[String](cons[Double](cons[String](cons[Int]()))) -> (t[Double] :: t[Int] :: Nil),
-    without[Int   ](cons[Double](cons[String](cons[Int]()))) -> (t[Double] :: t[String] :: Nil)
+    remove[Double](cons[Double](cons[String](cons[Int]()))) -> (t[String] :: t[Int] :: Nil),
+    remove[String](cons[Double](cons[String](cons[Int]()))) -> (t[Double] :: t[Int] :: Nil),
+    remove[Int   ](cons[Double](cons[String](cons[Int]()))) -> (t[Double] :: t[String] :: Nil),
+    remove[String](cons[String](cons[String](cons[Int]()))) -> (t[String] :: t[Int] :: Nil)
 
   )
 

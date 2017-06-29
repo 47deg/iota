@@ -53,7 +53,7 @@ class TypeListParserChecks(
     Reverse => TReverse,
     Take    => TTake,
     Drop    => TDrop,
-    Without => TWithout
+    Remove => TRemove
   }
 
   val tlists: List[(Type, Node)] = List(
@@ -76,8 +76,8 @@ class TypeListParserChecks(
     t[TDrop[2, BazBarFoo#L]] -> drop(2, cons[Baz](cons[Bar](cons[Foo]()))),
     t[TDrop[3, BazBarFoo#L]] -> drop(3, cons[Baz](cons[Bar](cons[Foo]()))),
 
-    t[TWithout[Baz, BazBarFoo#L]] -> without[Baz](cons[Baz](cons[Bar](cons[Foo]()))),
-    t[TWithout[Foo, BazBarFoo#L]] -> without[Foo](cons[Baz](cons[Bar](cons[Foo]())))
+    t[TRemove[Baz, BazBarFoo#L]] -> remove[Baz](cons[Baz](cons[Bar](cons[Foo]()))),
+    t[TRemove[Foo, BazBarFoo#L]] -> remove[Foo](cons[Baz](cons[Bar](cons[Foo]())))
   )
 
   import KList.Op.{
@@ -85,7 +85,7 @@ class TypeListParserChecks(
     Reverse => KReverse,
     Take    => KTake,
     Drop    => KDrop,
-    Without => KWithout
+    Remove => KRemove
   }
 
   val klists: List[(Type, Node)] = List(
@@ -105,8 +105,8 @@ class TypeListParserChecks(
     t[KDrop[2, BazBarFooK[_]#L]] -> drop(2, consk[BazK](consk[BarK](consk[FooK]()))),
     t[KDrop[3, BazBarFooK[_]#L]] -> drop(3, consk[BazK](consk[BarK](consk[FooK]()))),
 
-    t[KWithout[BazK, BazBarFooK[_]#L]] -> withoutk[BazK](consk[BazK](consk[BarK](consk[FooK]()))),
-    t[KWithout[FooK, BazBarFooK[_]#L]] -> withoutk[FooK](consk[BazK](consk[BarK](consk[FooK]())))
+    t[KRemove[BazK, BazBarFooK[_]#L]] -> removek[BazK](consk[BazK](consk[BarK](consk[FooK]()))),
+    t[KRemove[FooK, BazBarFooK[_]#L]] -> removek[FooK](consk[BazK](consk[BarK](consk[FooK]())))
   )
 
 }
