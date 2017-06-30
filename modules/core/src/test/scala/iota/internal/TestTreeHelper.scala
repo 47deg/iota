@@ -21,7 +21,7 @@ package internal
 
 import catryoshka._
 
-class TestTreeHelper(val tb: Toolbelt with TypeListTrees) {
+class TestTreeHelper(val tb: Toolbelt with TypeListAST) {
   import tb._
   import tb.u.{ Type, WeakTypeTag }
 

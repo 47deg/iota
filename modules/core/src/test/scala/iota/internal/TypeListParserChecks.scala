@@ -42,7 +42,7 @@ object TypeListParserChecks extends Properties("TypeListParsers") {
 }
 
 class TypeListParserChecks(
-  override val tb: Toolbelt with TypeListTrees with TypeListParsers
+  override val tb: Toolbelt with TypeListAST with TypeListParsers
 ) extends TestTreeHelper(tb) {
 
   import tb.u.Type

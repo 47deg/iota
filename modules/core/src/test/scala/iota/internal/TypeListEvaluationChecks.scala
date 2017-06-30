@@ -35,7 +35,7 @@ object TypeListEvaluationChecks extends Properties("TypeListEvaluators") {
 }
 
 class TypeListEvaluationChecks(
-  override val tb: Toolbelt with TypeListEvaluators with TypeListTrees
+  override val tb: Toolbelt with TypeListEvaluators with TypeListAST
 ) extends TestTreeHelper(tb) {
 
   import tb.u.Type

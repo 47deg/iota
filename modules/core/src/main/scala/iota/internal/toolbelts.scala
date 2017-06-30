@@ -36,12 +36,12 @@ import scala.reflect.api.Universe
 import scala.reflect.runtime.{ universe => runtimeUniverse }
 import scala.reflect.macros.blackbox.Context
 
-trait Toolbelt {
+private[internal] trait Toolbelt {
   type Uu <: Universe
   val u: Uu
 }
 
-trait MacroToolbelt extends Toolbelt {
+private[internal] trait MacroToolbelt extends Toolbelt {
   type Cc <: Context
   val c: Cc
 
@@ -57,23 +57,11 @@ object IotaReflectiveToolbelt {
     apply(runtimeUniverse)
 }
 
-final class IotaReflectiveToolbelt[U <: Universe](val u: U)
+final class IotaReflectiveToolbelt[U <: Universe] private(val u: U)
     extends Toolbelt
-    with TypeListTrees
-    with TypeListParsers
-    with TypeListEvaluators
-    with TypeListBuilders
-    with CoproductAPI { override type Uu = U }
-
-
-private[internal] class IotaMacroToolbelt[C <: Context](val c: C)
-    extends MacroToolbelt
-    with TypeListTrees
-    with TypeListParsers
-    with TypeListEvaluators
-    with TypeListBuilders
-    with CoproductAPI
-    with MacroAPI { override type Cc = C }
+    with CoproductAPIs
+    with TypeListAPIs
+    with TypeListBuilders { override type Uu = U }
 
 private[internal] object IotaMacroToolbelt {
   def apply[C <: Context](c: C): IotaMacroToolbelt[c.type] =
@@ -86,10 +74,16 @@ private[internal] object IotaMacroToolbelt {
   final val typeListCache: Cache = new Cache()
 }
 
+private[internal] class IotaMacroToolbelt[C <: Context] private(val c: C)
+    extends MacroToolbelt
+    with CoproductAPIs
+    with TypeListMacroAPIs
+    with TypeListBuilders { override type Cc = C }
+
 // --
 // - implementation
 
-private[internal] sealed trait TypeListTrees { self: Toolbelt =>
+private[internal] sealed trait TypeListAST { self: Toolbelt =>
   import u._
 
   sealed trait NodeF  [+A]
@@ -144,16 +138,30 @@ private[internal] sealed trait TypeListTrees { self: Toolbelt =>
   }
 }
 
-private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTrees =>
+private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST =>
   import u._
 
-  private[this] def literalInt(tpe: Type): Either[Id[String], Int] =
-    tpe match {
-      case ConstantType(Constant(value: Int)) => value.asRight
-      case _ => s"Expected $tpe to be a literal integer".asLeft
-    }
+  type TypeListParser = CoalgebraM[Either[Id[String], ?], NodeF, Type]
 
-  private[internal] type Parser = CoalgebraM[Either[Id[String], ?], NodeF, Type]
+  final lazy val tlistParser: TypeListParser = typeListParser(
+    NilSym     = symbolOf[iota.TNil],
+    ConsSym    = symbolOf[iota.TCons[Nothing, Nothing]],
+    ConcatSym  = symbolOf[iota.TList.Op.Concat[Nothing, Nothing]],
+    ReverseSym = symbolOf[iota.TList.Op.Reverse[Nothing]],
+    TakeSym    = symbolOf[iota.TList.Op.Take[Nothing, Nothing]],
+    DropSym    = symbolOf[iota.TList.Op.Drop[Nothing, Nothing]],
+    RemoveSym  = symbolOf[iota.TList.Op.Remove[Nothing, Nothing]])
+
+  final lazy val klistParser: TypeListParser = typeListParser(
+    NilSym     = symbolOf[iota.KNil],
+    ConsSym    = symbolOf[iota.KCons[Nothing, Nothing]],
+    ConcatSym  = symbolOf[iota.KList.Op.Concat[Nothing, Nothing]],
+    ReverseSym = symbolOf[iota.KList.Op.Reverse[Nothing]],
+    TakeSym    = symbolOf[iota.KList.Op.Take[Nothing, Nothing]],
+    DropSym    = symbolOf[iota.KList.Op.Drop[Nothing, Nothing]],
+    RemoveSym  = symbolOf[iota.KList.Op.Remove[Nothing, Nothing]])
+
+  private[this] def symbolOf[T](implicit evT: WeakTypeTag[T]): Symbol = evT.tpe.typeSymbol
 
   private[internal] def typeListParser(
     ConsSym   : Symbol,
@@ -163,7 +171,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
     TakeSym   : Symbol,
     DropSym   : Symbol,
     RemoveSym: Symbol
-  ): Parser = tpe0 => {
+  ): TypeListParser = tpe0 => {
     @tailrec def loop(tpe: Type): Either[Id[String], NodeF[Type]] = tpe.dealias match {
       case TypeRef(_, sym, args) =>
         sym.asType.toType.dealias.typeSymbol match {
@@ -182,31 +190,19 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListTre
     loop(tpe0)
   }
 
-  private[this] def symbolOf[T](implicit evT: WeakTypeTag[T]): Symbol = evT.tpe.typeSymbol
-
-  final lazy val tlistParser: Parser = typeListParser(
-    NilSym     = symbolOf[iota.TNil],
-    ConsSym    = symbolOf[iota.TCons[Nothing, Nothing]],
-    ConcatSym  = symbolOf[iota.TList.Op.Concat[Nothing, Nothing]],
-    ReverseSym = symbolOf[iota.TList.Op.Reverse[Nothing]],
-    TakeSym    = symbolOf[iota.TList.Op.Take[Nothing, Nothing]],
-    DropSym    = symbolOf[iota.TList.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[iota.TList.Op.Remove[Nothing, Nothing]])
-
-  final lazy val klistParser: Parser = typeListParser(
-    NilSym     = symbolOf[iota.KNil],
-    ConsSym    = symbolOf[iota.KCons[Nothing, Nothing]],
-    ConcatSym  = symbolOf[iota.KList.Op.Concat[Nothing, Nothing]],
-    ReverseSym = symbolOf[iota.KList.Op.Reverse[Nothing]],
-    TakeSym    = symbolOf[iota.KList.Op.Take[Nothing, Nothing]],
-    DropSym    = symbolOf[iota.KList.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[iota.KList.Op.Remove[Nothing, Nothing]])
+  private[this] def literalInt(tpe: Type): Either[Id[String], Int] =
+    tpe match {
+      case ConstantType(Constant(value: Int)) => value.asRight
+      case _ => s"Expected $tpe to be a literal integer".asLeft
+    }
 }
 
-private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeListTrees with TypeListParsers =>
+private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeListAST =>
   import u._
 
-  final def evalTree: Algebra[NodeF, List[Type]] = {
+  type TypeListEvaluator = Algebra[NodeF, List[Type]]
+
+  final def evalTree: TypeListEvaluator = {
     case ConsF(head, types) => head :: types
     case ConcatF(typeLists) => FlatMap[List].flatten(typeLists)
     case ReverseF(types)    => types.reverse
@@ -220,6 +216,46 @@ private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeList
     val (before, atAndAfter) = list.span(!pred(_))
     before ::: atAndAfter.drop(1)
   }
+}
+
+private[internal] sealed trait TypeListBuilders { self: Toolbelt with TypeListAST =>
+  import u._
+
+  type TypeListBuilder = Algebra[List, Type]
+
+  final lazy val buildTList: TypeListBuilder =
+    typeListBuilder(
+      weakTypeOf[TCons[_, _]].typeConstructor,
+      weakTypeOf[TNil])
+
+  final lazy val buildKList: TypeListBuilder =
+    typeListBuilder(
+      weakTypeOf[KCons[Nothing, _]].typeConstructor,
+      weakTypeOf[KNil])
+
+  private[internal] def typeListBuilder(
+    consTpe: Type,
+    nilTpe: Type
+  ): TypeListBuilder = {
+
+    lazy val (consPrefix, consSym) = consTpe match {
+      case TypeRef(prefix, sym, _) => (prefix, sym)
+      case _ => sys.error("internal iota initialization error")
+    }
+
+    tpes => tpes.foldRight(nilTpe)((tpe, acc) =>
+      internal.typeRef(consPrefix, consSym, tpe :: acc :: Nil))
+  }
+}
+
+private[internal] sealed trait TypeListAPIs
+    extends TypeListAST
+    with TypeListParsers
+    with TypeListEvaluators
+{
+  self: Toolbelt =>
+
+  import u._
 
   final def tlistTypes(tpe: Type): Either[Id[String], List[Type]] =
     hyloM(tpe)(
@@ -233,42 +269,10 @@ private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeList
 
   final def klistTypeConstructors(tpe: Type): Either[Id[String], List[Type]] =
     klistTypes(tpe).map(_.map(_.etaExpand.resultType))
+
 }
 
-private[internal] sealed trait TypeListBuilders { self: Toolbelt with TypeListTrees =>
-  import u._
-
-  class TypeListBuilder private[TypeListBuilders](
-    consTpe: Type,
-    nilTpe: Type
-  ) {
-    final def apply(tpes: List[Type]): Type =
-      tpes.foldRight(nilTpe)(makeCons)
-
-    private[this] lazy val (consPrefix, consSym) = consTpe match {
-      case TypeRef(prefix, sym, _) => (prefix, sym)
-      case _ => sys.error("internal iota initialization error")
-    }
-
-    private[this] def makeCons(head: Type, tail: Type): Type =
-      internal.typeRef(consPrefix, consSym, head :: tail :: Nil)
-
-    val bleep: Algebra[ConsF, Type] = cons =>
-      internal.typeRef(consPrefix, consSym, cons.head :: cons.tail :: Nil)
-  }
-
-  final lazy val buildTList: TypeListBuilder =
-    new TypeListBuilder(
-      weakTypeOf[TCons[_, _]].typeConstructor,
-      weakTypeOf[TNil])
-
-  final lazy val buildKList: TypeListBuilder =
-    new TypeListBuilder(
-      weakTypeOf[KCons[Nothing, _]].typeConstructor,
-      weakTypeOf[KNil])
-}
-
-private[internal] sealed trait CoproductAPI { self: Toolbelt =>
+private[internal] sealed trait CoproductAPIs { self: Toolbelt =>
   import u._
 
   case class CopTypes(L: Type)
@@ -296,7 +300,12 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring CopK $tpe")
     }
 
-  private[this] final def projectPoly(tpe: PolyType, lambdaName: TypeName = TypeName("ξ$")): Tree = {
+  /** Converts an eta expanded `PolyType` such as `[z]Either[String, z]`
+    * into a type lambda `Tree` `({ type ξ$[z] = Either[String, z] })#ξ$`.
+    * The parameter `z` is taken from the original type and used in
+    * resulting tree.
+    */
+  private[this] final def projectPoly(tpe: PolyType, lambdaName: TypeName = TypeName("ξ$")): Tree =
     SelectFromTypeTree(CompoundTypeTree(
       Template(
         q"_root_.scala.AnyRef" :: Nil,
@@ -304,8 +313,10 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
         TypeDef(NoMods, lambdaName, tpe.typeParams.map(internal.typeDef(_)),
           q"${tpe.resultType}") :: Nil)),
       lambdaName)
-  }
 
+  /** Converts a `Type` to a `Tree` so that it can be safely
+    * lifted into quasiquotes
+    */
   private[this] final def toTypeTree(tpe: Type): Tree = tpe match {
     case poly: PolyType       => projectPoly(poly)
     case TypeRef(_, sym, Nil) => Ident(sym.name)
@@ -321,7 +332,7 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
   ): Tree = {
 
     val A  = TypeName("Ξ$")
-    val fa = TermName("fa")
+    val fa = TermName("η$")
     val FF = toTypeTree(F)
     val GG = toTypeTree(G)
     val FA = AppliedTypeTree(FF, Ident(A) :: Nil)
@@ -346,7 +357,7 @@ private[internal] sealed trait CoproductAPI { self: Toolbelt =>
   }
 }
 
-private[internal] sealed trait MacroAPI { self: MacroToolbelt with TypeListEvaluators =>
+private[internal] sealed trait TypeListMacroAPIs extends TypeListAPIs { self: MacroToolbelt =>
   import u._
 
   lazy val showAborts =

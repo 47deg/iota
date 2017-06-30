@@ -162,7 +162,9 @@ private[internal] object catryoshka {
       t => Cofree(t.ask, Eval.later(t.lower)),
       t => EnvT(t.head, t.tail.value))
 
-  implicit final class AlgebraOps[F[_], A](val self: Algebra[F, A]) extends AnyVal {
+  implicit final class AlgebraOps[F[_], A](val self: F[A] => A) extends AnyVal {
+    // note: above, Algebra[F, A] is expanded to F[A] => A because this
+    // apparently has better type inferencing
     def generalizeM[M[_]: Applicative](implicit F: Functor[F]): AlgebraM[M, F, A] =
       node => self(node).pure[M]
   }
