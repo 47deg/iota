@@ -18,6 +18,16 @@ import cats.data._ //#=2.11
 
 package object iota {
 
+  /** The terminal element of a type list */
+  type TNil <: TList
+
+  /** A type list characterized by a head type and a list of tail types
+    *
+    * @tparam H the head type
+    * @tparam T the list of tail types
+    */
+  type TCons[H, T <: TList] <: TList
+
   /** The terminal element of a type constructor list */
   type TNilK <: TListK
 
@@ -28,16 +38,6 @@ package object iota {
     * @tparam T the list of tail type constructors
     */
   type TConsK[H[_], T <: TListK] <: TListK
-
-  /** The terminal element of a type list */
-  type TNil <: TList
-
-  /** A type list characterized by a head type and a list of tail types
-    *
-    * @tparam H the head type
-    * @tparam T the list of tail types
-    */
-  type TCons[H, T <: TList] <: TList
 
   //#+2.11
   private[iota] implicit final class EitherCompatOps[A, B](
