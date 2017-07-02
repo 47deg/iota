@@ -29,12 +29,12 @@ object NestedCoproducts extends App {
   case class Op4[A]()
   case class Op5[A]()
 
-  import KList.::
-  import KList.Op.Concat
-  import KList.Op.Reverse
+  import TListK.::
+  import TListK.Op.Concat
+  import TListK.Op.Reverse
 
-  type AlgA[A] = CopK[Op0 :: Op1 :: Op2 :: KNil, A]
-  type AlgB[A] = CopK[Op3 :: Op4 :: Op5 :: KNil, A]
+  type AlgA[A] = CopK[Op0 :: Op1 :: Op2 :: TNilK, A]
+  type AlgB[A] = CopK[Op3 :: Op4 :: Op5 :: TNilK, A]
 
   type AFwd[A] = CopK[Concat[AlgA[_]#L, AlgB[_]#L], A]
   type ARev[A] = CopK[Reverse[Concat[AlgA[_]#L, AlgB[_]#L]], A]

@@ -152,14 +152,14 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
     DropSym    = symbolOf[iota.TList.Op.Drop[Nothing, Nothing]],
     RemoveSym  = symbolOf[iota.TList.Op.Remove[Nothing, Nothing]])
 
-  final lazy val klistParser: TypeListParser = typeListParser(
-    NilSym     = symbolOf[iota.KNil],
-    ConsSym    = symbolOf[iota.KCons[Nothing, Nothing]],
-    ConcatSym  = symbolOf[iota.KList.Op.Concat[Nothing, Nothing]],
-    ReverseSym = symbolOf[iota.KList.Op.Reverse[Nothing]],
-    TakeSym    = symbolOf[iota.KList.Op.Take[Nothing, Nothing]],
-    DropSym    = symbolOf[iota.KList.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[iota.KList.Op.Remove[Nothing, Nothing]])
+  final lazy val tlistkParser: TypeListParser = typeListParser(
+    NilSym     = symbolOf[iota.TNilK],
+    ConsSym    = symbolOf[iota.TConsK[Nothing, Nothing]],
+    ConcatSym  = symbolOf[iota.TListK.Op.Concat[Nothing, Nothing]],
+    ReverseSym = symbolOf[iota.TListK.Op.Reverse[Nothing]],
+    TakeSym    = symbolOf[iota.TListK.Op.Take[Nothing, Nothing]],
+    DropSym    = symbolOf[iota.TListK.Op.Drop[Nothing, Nothing]],
+    RemoveSym  = symbolOf[iota.TListK.Op.Remove[Nothing, Nothing]])
 
   private[this] def symbolOf[T](implicit evT: WeakTypeTag[T]): Symbol = evT.tpe.typeSymbol
 
@@ -228,10 +228,10 @@ private[internal] sealed trait TypeListBuilders { self: Toolbelt with TypeListAS
       weakTypeOf[TCons[_, _]].typeConstructor,
       weakTypeOf[TNil])
 
-  final lazy val buildKList: TypeListBuilder =
+  final lazy val buildTListK: TypeListBuilder =
     typeListBuilder(
-      weakTypeOf[KCons[Nothing, _]].typeConstructor,
-      weakTypeOf[KNil])
+      weakTypeOf[TConsK[Nothing, _]].typeConstructor,
+      weakTypeOf[TNilK])
 
   private[internal] def typeListBuilder(
     consTpe: Type,
@@ -262,13 +262,13 @@ private[internal] sealed trait TypeListAPIs
       evalTree.generalizeM[Either[Id[String], ?]],
       tlistParser)
 
-  final def klistTypes(tpe: Type): Either[Id[String], List[Type]] =
+  final def tlistkTypes(tpe: Type): Either[Id[String], List[Type]] =
     hyloM(tpe)(
       evalTree.generalizeM[Either[Id[String], ?]],
-      klistParser)
+      tlistkParser)
 
-  final def klistTypeConstructors(tpe: Type): Either[Id[String], List[Type]] =
-    klistTypes(tpe).map(_.map(_.etaExpand.resultType))
+  final def tlistkTypeConstructors(tpe: Type): Either[Id[String], List[Type]] =
+    tlistkTypes(tpe).map(_.map(_.etaExpand.resultType))
 
 }
 
@@ -404,6 +404,6 @@ private[internal] sealed trait TypeListMacroAPIs extends TypeListAPIs { self: Ma
   def memoizedTListTypes(tpe: Type): Either[Id[String], List[Type]] =
     memoize(IotaMacroToolbelt.typeListCache)(tpe, tlistTypes)
 
-  def memoizedKListTypes(tpe: Type): Either[Id[String], List[Type]] =
-    memoize(IotaMacroToolbelt.typeListCache)(tpe, klistTypes)
+  def memoizedTListKTypes(tpe: Type): Either[Id[String], List[Type]] =
+    memoize(IotaMacroToolbelt.typeListCache)(tpe, tlistkTypes)
 }

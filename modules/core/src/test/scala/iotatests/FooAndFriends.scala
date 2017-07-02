@@ -33,14 +33,14 @@ object FooAndFriends {
   type BazBarFoo = Cop[BazBarFooL]
 
 
-  import KList.:::
+  import TListK.:::
 
   trait FooK[A]
   type BarK[A] = cats.data.NonEmptyList[A]
   type BazK[A] = Option[String with A] // ¯\_(ツ)_/¯
 
-  type FooBarBazKL = FooK ::: BarK ::: BazK ::: KNil
-  type BazBarFooKL = BazK ::: BarK ::: FooK ::: KNil
+  type FooBarBazKL = FooK ::: BarK ::: BazK ::: TNilK
+  type BazBarFooKL = BazK ::: BarK ::: FooK ::: TNilK
 
   type FooBarBazK[A] = CopK[FooBarBazKL, A]
   type BazBarFooK[A] = CopK[BazBarFooKL, A]

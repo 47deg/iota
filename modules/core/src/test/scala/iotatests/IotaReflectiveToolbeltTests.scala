@@ -46,12 +46,12 @@ class IotaReflectiveToolbeltTests extends Properties("IotaReflectiveToolbelt") {
     tb.tlistTypes(weakTypeOf[BazBarFooL]) ?=:= Right(
       typeOf[Baz] :: typeOf[Bar] :: typeOf[Foo] :: Nil)
 
-  property("klistTypeConstructors FooBarBazKL") =
-    tb.klistTypeConstructors(weakTypeOf[FooBarBazKL]) ?=:= Right(
+  property("tlistkTypeConstructors FooBarBazKL") =
+    tb.tlistkTypeConstructors(weakTypeOf[FooBarBazKL]) ?=:= Right(
       typeOfK[FooK] :: typeOfK[BarK] :: typeOfK[BazK] :: Nil)
 
-  property("klistTypeConstructors BazBarFooKL") =
-    tb.klistTypeConstructors(weakTypeOf[BazBarFooKL]) ?=:= Right(
+  property("tlistkTypeConstructors BazBarFooKL") =
+    tb.tlistkTypeConstructors(weakTypeOf[BazBarFooKL]) ?=:= Right(
       typeOfK[BazK] :: typeOfK[BarK] :: typeOfK[FooK] :: Nil)
 
   property("destructCop Cop[FooBarBazL]") =

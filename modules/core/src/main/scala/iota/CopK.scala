@@ -17,7 +17,7 @@
 package iota
 
 /** A coproduct of type constructors captured by type constructor list `L` */
-final class CopK[LL <: KList, A] private[iota](
+final class CopK[LL <: TListK, A] private[iota](
   val index: Int,
   val value: Any
 ) {
@@ -34,7 +34,7 @@ final class CopK[LL <: KList, A] private[iota](
 
 object CopK {
 
-  def unsafeApply[L <: KList, F[_], A](index: Int, fa: F[A]): CopK[L, A] =
+  def unsafeApply[L <: TListK, F[_], A](index: Int, fa: F[A]): CopK[L, A] =
     new CopK[L, A](index, fa)
 
   /** A type class witnessing the ability to inject type constructor `F`
@@ -50,7 +50,7 @@ object CopK {
   object Inject {
     def apply[F[_], G[_] <: CopK[_, _]](implicit ev: Inject[F, G]): Inject[F, G] = ev
 
-    implicit def injectFromInjectL[F[_], L <: KList](
+    implicit def injectFromInjectL[F[_], L <: TListK](
       implicit ev: InjectL[F, L]
     ): Inject[F, CopK[L, ?]] = new Inject[F, CopK[L, ?]] {
       def inj[A](fa: F[A]): CopK[L, A] = ev.inj(fa)
@@ -59,9 +59,9 @@ object CopK {
   }
 
   /** A type class witnessing the ability to inject type constructor `F`
-    * into a coproduct of types constructors for [[KList]] type `L`
+    * into a coproduct of types constructors for [[TListK]] type `L`
     */
-  final class InjectL[F[_], L <: KList] private[InjectL](index: Int) {
+  final class InjectL[F[_], L <: TListK] private[InjectL](index: Int) {
     def inj[A](fa: F[A]): CopK[L, A] = new CopK[L, A](index, fa)
     def proj[A](ca: CopK[L, A]): Option[F[A]] =
       if (ca.index == index) Some(ca.value.asInstanceOf[F[A]])
@@ -71,13 +71,13 @@ object CopK {
   }
 
   object InjectL {
-    def apply[F[_], L <: KList](implicit ev: InjectL[F, L]): InjectL[F, L] = ev
-    implicit def makeInjectL[F[_], L <: KList](implicit ev: KList.Pos[L, F]): InjectL[F, L] =
+    def apply[F[_], L <: TListK](implicit ev: InjectL[F, L]): InjectL[F, L] = ev
+    implicit def makeInjectL[F[_], L <: TListK](implicit ev: TListK.Pos[L, F]): InjectL[F, L] =
       new InjectL[F, L](ev.index)
   }
 
-  final class RemoveL[F[_], L <: KList] private[RemoveL](index: Int) {
-    def apply[A](c: CopK[L, A]): Either[CopK[KList.Op.Remove[F, L], A], F[A]] =
+  final class RemoveL[F[_], L <: TListK] private[RemoveL](index: Int) {
+    def apply[A](c: CopK[L, A]): Either[CopK[TListK.Op.Remove[F, L], A], F[A]] =
       Either.cond(
         c.index == index,
         c.value.asInstanceOf[F[A]],
@@ -85,8 +85,8 @@ object CopK {
   }
 
   object RemoveL {
-    def apply[F[_], L <: KList](implicit ev: RemoveL[F, L]): RemoveL[F, L] = ev
-    implicit def makeRemoveL[F[_], L <: KList](implicit ev: KList.Pos[L, F]): RemoveL[F, L] =
+    def apply[F[_], L <: TListK](implicit ev: RemoveL[F, L]): RemoveL[F, L] = ev
+    implicit def makeRemoveL[F[_], L <: TListK](implicit ev: TListK.Pos[L, F]): RemoveL[F, L] =
       new RemoveL[F, L](ev.index)
   }
 

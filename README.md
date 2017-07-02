@@ -1,7 +1,6 @@
-
 [comment]: # (Start Badges)
 
-[![Build Status](https://travis-ci.org/47deg/iota.svg?branch=master)](https://travis-ci.org/47deg/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.2.0-green.svg)](https://oss.sonatype.org/#nexus-search;gav~com.47deg~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/47deg/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.2.0-green.svg)](https://index.scala-lang.org/47deg/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.15.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/47deg/iota.svg)](https://github.com/47deg/iota/issues)
+[![Build Status](https://travis-ci.org/47deg/iota.svg?branch=master)](https://travis-ci.org/47deg/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.1.0-green.svg)](https://oss.sonatype.org/#nexus-search;gav~com.47deg~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/47deg/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.1.0-green.svg)](https://index.scala-lang.org/47deg/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.16.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/47deg/iota.svg)](https://github.com/47deg/iota/issues)
 
 [comment]: # (End Badges)
 
@@ -36,13 +35,13 @@ support any number of disjunct types.
 ```scala
 import iota._
 import TList.::
-import KList.:::
+import TListK.:::
 
 // a coproduct of types
 type Foo = Cop[Int :: String :: Double :: TNil]
 
 // a coproduct of type constructors
-type Bar[A] = CopK[Option ::: List ::: Seq ::: KNil, A]
+type Bar[A] = CopK[Option ::: List ::: Seq ::: TNilK, A]
 ```
 
 ## Installation
@@ -145,7 +144,7 @@ sealed abstract class UserOp[A]
 sealed abstract class OrderOp[A]
 sealed abstract class PriceOp[A]
 
-type Algebra[A] = CopK[UserOp ::: OrderOp ::: PriceOp ::: KNil, A]
+type Algebra[A] = CopK[UserOp ::: OrderOp ::: PriceOp ::: TNilK, A]
 
 val evalUserOp : UserOp  ~> Future = dummyInterpreter
 val evalOrderOp: OrderOp ~> Future = dummyInterpreter
@@ -189,10 +188,10 @@ CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
 //     private[this] val arr0 = evalUserOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
 //     private[this] val arr1 = evalOrderOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
 //     private[this] val arr2 = evalPriceOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
-//     override def apply[Ξ$](fa: Algebra[Ξ$]): Future[Ξ$] = (fa.index: @_root_.scala.annotation.switch) match {
-//       case 0 => arr0(fa.value)
-//       case 1 => arr1(fa.value)
-//       case 2 => arr2(fa.value)
+//     override def apply[Ξ$](η$: Algebra[Ξ$]): Future[Ξ$] = (η$.index: @_root_.scala.annotation.switch) match {
+//       case 0 => arr0(η$.value)
+//       case 1 => arr1(η$.value)
+//       case 2 => arr2(η$.value)
 //       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds for ").+(this)...res32: iota.internal.FastFunctionK[Algebra,scala.concurrent.Future] = FastFunctionK[Algebra, scala.concurrent.Future]<<generated>>
 ```
 

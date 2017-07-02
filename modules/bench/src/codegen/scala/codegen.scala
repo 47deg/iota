@@ -91,7 +91,7 @@ object BenchBoiler {
       |
       |object Iota {
       |  import Ops._
-      |  import KList.::
+      |  import TListK.::
       |
         ${iotaAlgebras.mkString("\n")}
 
@@ -167,15 +167,15 @@ object BenchBoiler {
   def iotaAlgebraHeadTemplate(
     name: String
   ): String =
-    s"""|  type KList$name      = ${name}Op :: KNil
-        |  type Algebra$name[A] = CopK[KList$name, A]"""
+    s"""|  type TListK$name      = ${name}Op :: TNilK
+        |  type Algebra$name[A] = CopK[TListK$name, A]"""
 
   def iotaAlgebraTailTemplate(
     prevName: String,
     name: String
   ): String =
-    s"""|  type KList$name      = ${name}Op :: KList$prevName
-        |  type Algebra$name[A] = CopK[KList$name, A]"""
+    s"""|  type TListK$name      = ${name}Op :: TListK$prevName
+        |  type Algebra$name[A] = CopK[TListK$name, A]"""
 
   def iotaEvalTemplate(
     name: String,

@@ -41,7 +41,7 @@ final class CopKFunctionKMacros(val c: Context) {
 
     tb.foldAbort(for {
       copK <- tb.destructCopK(F).leftMap(NonEmptyList.of(_))
-      tpes <- tb.memoizedKListTypes(copK.L).leftMap(NonEmptyList.of(_))
+      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.of(_))
 
       unorderedPairs <- Traverse[List].traverse(args.toList)(arg =>
         destructFunctionKInput(arg.tree.tpe, G).map((_, arg.tree))).toEither
@@ -63,7 +63,7 @@ final class CopKFunctionKMacros(val c: Context) {
 
     tb.foldAbort(for {
       copK <- tb.destructCopK(F).leftMap(NonEmptyList.of(_))
-      tpes <- tb.memoizedKListTypes(copK.L).leftMap(NonEmptyList.of(_))
+      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.of(_))
 
       arrs <- Traverse[List].traverse(tpes)(tpe =>
                 summonFunctionK(tpe, G)).toEither

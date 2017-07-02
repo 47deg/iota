@@ -48,9 +48,9 @@ object MathAlgebraKs {
 
 object FreeCopK extends Properties("FreeCopK") {
 
-  import KList.::
+  import TListK.::
   import MathAlgebraKs._
-  type Algebra[A]  = CopK[AddOne :: XTwo :: Neg :: Half :: KNil, A]
+  type Algebra[A]  = CopK[AddOne :: XTwo :: Neg :: Half :: TNilK, A]
 
   implicit lazy val evalAddOne: AddOne ~> Id = λ[AddOne ~> Id] { case AddOne.Value(v) => v + 1 }
   implicit lazy val evalXTwo  : XTwo   ~> Id = λ[XTwo   ~> Id] { case XTwo.Value  (v) => v * 2 }

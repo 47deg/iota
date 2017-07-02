@@ -5,7 +5,7 @@ import iota._
 
 object CopKFunctionKTests {
 
-  import KList.::
+  import TListK.::
 
   type FooOp[A] = A with "foo"
   type BarOp[A] = A with "bar"
@@ -20,6 +20,6 @@ object CopKFunctionKTests {
       def apply[A](fa: BarOp[A]): Either[String, A] = Right(fa)
     }
 
-  CopKFunctionK.summon[CopK[FooOp :: BarOp :: KNil, ?], Either[String, ?]]
+  CopKFunctionK.summon[CopK[FooOp :: BarOp :: TNilK, ?], Either[String, ?]]
 
 }

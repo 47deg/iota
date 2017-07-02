@@ -36,8 +36,8 @@ object TypeListParserChecks extends Properties("TypeListParsers") {
   checks.tlists.foreach { case (in, out) =>
     property(s"parse TList $in") = Corecursive[checks.Node].anaM(in)(checks.tb.tlistParser) ?= Right(out) }
 
-  checks.klists.foreach { case (in, out) =>
-    property(s"parse KList $in") = Corecursive[checks.Node].anaM(in)(checks.tb.klistParser) ?= Right(out) }
+  checks.tlistks.foreach { case (in, out) =>
+    property(s"parse TListK $in") = Corecursive[checks.Node].anaM(in)(checks.tb.tlistkParser) ?= Right(out) }
 
 }
 
@@ -53,7 +53,7 @@ class TypeListParserChecks(
     Reverse => TReverse,
     Take    => TTake,
     Drop    => TDrop,
-    Remove => TRemove
+    Remove  => TRemove
   }
 
   val tlists: List[(Type, Node)] = List(
@@ -80,17 +80,17 @@ class TypeListParserChecks(
     t[TRemove[Foo, BazBarFoo#L]] -> remove[Foo](cons[Baz](cons[Bar](cons[Foo]())))
   )
 
-  import KList.Op.{
+  import TListK.Op.{
     Concat  => KConcat,
     Reverse => KReverse,
     Take    => KTake,
     Drop    => KDrop,
-    Remove => KRemove
+    Remove  => KRemove
   }
 
-  val klists: List[(Type, Node)] = List(
+  val tlistks: List[(Type, Node)] = List(
 
-    t[KReverse[KNil]] -> reverse(nnil),
+    t[KReverse[TNilK]] -> reverse(nnil),
 
     t[CopK[BazBarFooKL, Nothing]#L] -> consk[BazK](consk[BarK](consk[FooK]())),
 

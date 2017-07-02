@@ -25,8 +25,8 @@ import org.scalacheck.Shapeless._
 
 object CopKTests extends Properties("CopKTests") {
 
-  import KList.::
-  import KList.Op._
+  import TListK.::
+  import TListK.Op._
 
   sealed abstract class One[A]
   object One {
@@ -43,15 +43,15 @@ object CopKTests extends Properties("CopKTests") {
     case class Value(a: Int) extends Three[Int]
   }
 
-  type OneTwoThreeL = One :: Two :: Three :: KNil
-  type ThreeTwoOneL = Three :: Two :: One :: KNil
+  type OneTwoThreeL = One :: Two :: Three :: TNilK
+  type ThreeTwoOneL = Three :: Two :: One :: TNilK
 
   // these just need to compile
   CopK.InjectL[One, OneTwoThreeL]
   CopK.InjectL[CopKTests.One, OneTwoThreeL]
   CopK.InjectL[_root_.iotatests.CopKTests.One, OneTwoThreeL]
 
-  def checkInjectL[F[_], L <: KList, A](
+  def checkInjectL[F[_], L <: TListK, A](
     gen: Gen[F[A]],
     inj: CopK.InjectL[F, L],
     index: Int
@@ -128,7 +128,7 @@ object CopKTests extends Properties("CopKTests") {
     Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
     Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
     Last ::
-    KNil
+    TNilK
 
 
   property("inject First into Yuge") =

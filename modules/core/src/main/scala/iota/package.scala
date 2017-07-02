@@ -19,7 +19,7 @@ import cats.data._ //#=2.11
 package object iota {
 
   /** The terminal element of a type constructor list */
-  type KNil <: KList
+  type TNilK <: TListK
 
   /** A type constructor list characterized by a head type
     * constructor and a list of tail type constructors
@@ -27,7 +27,7 @@ package object iota {
     * @tparam H the head type constructor
     * @tparam T the list of tail type constructors
     */
-  type KCons[H[_], T <: KList] <: KList
+  type TConsK[H[_], T <: TListK] <: TListK
 
   /** The terminal element of a type list */
   type TNil <: TList
