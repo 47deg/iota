@@ -16,6 +16,8 @@
 
 package iota
 
+import cats.~>
+
 /** A coproduct of type constructors captured by type constructor list `L` */
 final class CopK[LL <: TListK, A] private[iota](
   val index: Int,
@@ -40,12 +42,7 @@ object CopK {
   /** A type class witnessing the ability to inject type constructor `F`
     * into a coproduct of type constructors `G`
     */
-  sealed abstract class Inject[F[_], G[_] <: CopK[_, _]] {
-    def inj[A](fa: F[A]): G[A]
-    def proj[A](ga: G[A]): Option[F[A]]
-    final def apply[A](fa: F[A]): G[A] = inj(fa)
-    final def unapply[A](ga: G[A]): Option[F[A]] = proj(ga)
-  }
+  sealed abstract class Inject[F[_], G[_] <: CopK[_, _]] extends cats.InjectK[F, G]
 
   object Inject {
     def apply[F[_], G[_] <: CopK[_, _]](implicit ev: Inject[F, G]): Inject[F, G] = ev
@@ -53,8 +50,8 @@ object CopK {
     implicit def injectFromInjectL[F[_], L <: TListK](
       implicit ev: InjectL[F, L]
     ): Inject[F, CopK[L, ?]] = new Inject[F, CopK[L, ?]] {
-      def inj[A](fa: F[A]): CopK[L, A] = ev.inj(fa)
-      def proj[A](ca: CopK[L, A]): Option[F[A]] = ev.proj(ca)
+      val inj: F ~> CopK[L, ?] = λ[F ~> CopK[L, ?]](ev.inj(_))
+      val prj: CopK[L, ?] ~> λ[α => Option[F[α]]] = λ[CopK[L, ?] ~> λ[α => Option[F[α]]]](ev.proj(_))
     }
   }
 

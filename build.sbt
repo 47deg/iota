@@ -11,8 +11,8 @@ lazy val core = module("core", hideFolder = true)
   .settings(yax(file("modules/core/src/test/scala"), Test,
     yaxPlatform = true))
   .crossDepSettings(
-    %%("cats-core"),
-    %%("cats-free"),
+    %%("cats-core", V.cats),
+    %%("cats-free", V.cats),
     %%("scalacheck")      % "test",
     %%("shapeless")       % "test",
     %%("scheckShapeless") % "test")
@@ -43,7 +43,6 @@ lazy val bench = jvmModule("bench")
   .settings(classpathConfiguration in Codegen := Compile)
   .settings(noPublishSettings)
   .settings(libraryDependencies ++= Seq(
-    %%("cats-free"),
     %%("scalacheck")))
   .settings(inConfig(Compile)(
     sourceGenerators += Def.task {
@@ -62,3 +61,7 @@ lazy val Codegen = config("codegen").hide
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
 pgpPublicRing := file(s"$gpgFolder/pubring.asc")
 pgpSecretRing := file(s"$gpgFolder/secring.asc")
+
+lazy val V = new {
+  val cats = "1.0.0-MF"
+}

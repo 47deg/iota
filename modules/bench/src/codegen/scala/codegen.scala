@@ -59,7 +59,6 @@ object BenchBoiler {
       |import iota._
       |import cats._
       |import cats.data.{ State => _, _ }
-      |import cats.free._
       |
       |import org.scalacheck._
       |
@@ -83,7 +82,7 @@ object BenchBoiler {
         ${catsEvals.mkString("\n")}
       |
       |  private[this] implicit class InjectGenOps[F[_]](gf: Gen[F[_]]) {
-      |    def inj[G[_]](implicit ev: Inject[F, G]): Gen[G[_]] = gf.map(f => ev.inj(f))
+      |    def inj[G[_]](implicit ev: InjectK[F, G]): Gen[G[_]] = gf.map(f => ev.inj(f))
       |  }
       |
         ${genAlgebras.mkString("\n")}
@@ -151,7 +150,7 @@ object BenchBoiler {
     prevName: String,
     name: String
   ): String =
-    s"|  type Algebra$name[A] = Coproduct[${name}Op, Algebra$prevName, A]"
+    s"|  type Algebra$name[A] = EitherK[${name}Op, Algebra$prevName, A]"
 
   def catsEvalHeadTemplate(
     name: String

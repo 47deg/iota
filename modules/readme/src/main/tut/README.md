@@ -22,9 +22,9 @@ import cats.data._
 // a coproduct of types using scala.util.Either
 type EitherFoo = Either[Int, Either[String, Double]]
 
-// a coproduct of type constructors using cats.data.Coproduct
-type CoproductBar0[A] = Coproduct[List, Seq, A]
-type CoproductBar[A] = Coproduct[Option, CoproductBar0, A]
+// a coproduct of type constructors using cats.data.EitherK
+type EitherKBar0[A] = EitherK[List, Seq, A]
+type EitherKBar[A] = EitherK[Option, EitherKBar0, A]
 ```
 
 Iota coproducts are linked lists at the type level. At the value level,

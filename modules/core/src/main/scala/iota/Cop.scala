@@ -40,12 +40,7 @@ object Cop {
   /** A type class witnessing the ability to inject type `A` into a
     * coproduct of types `B`
     */
-  sealed abstract class Inject[A, B <: Cop[_]] {
-    def inj(a: A): B
-    def proj(b: B): Option[A]
-    final def apply(a: A): B = inj(a)
-    final def unapply(b: B): Option[A] = proj(b)
-  }
+  sealed abstract class Inject[A, B <: Cop[_]] extends cats.Inject[A, B]
 
   object Inject {
     def apply[A, B <: Cop[_]](implicit ev: Inject[A, B]): Inject[A, B] = ev
@@ -53,8 +48,8 @@ object Cop {
     implicit def injectFromInjectL[A, L <: TList](
       implicit ev: InjectL[A, L]
     ): Inject[A, Cop[L]] = new Inject[A, Cop[L]] {
-      def inj(a: A): Cop[L] = ev.inj(a)
-      def proj(c: Cop[L]): Option[A] = ev.proj(c)
+      val inj: A => Cop[L] = ev.inj(_)
+      val prj: Cop[L] => Option[A] = ev.proj(_)
     }
   }
 
