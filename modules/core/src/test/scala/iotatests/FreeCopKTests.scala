@@ -82,4 +82,15 @@ object FreeCopK extends Properties("FreeCopK") {
   property("basic math program regular interpreter") =
     program.foldMap(evalOf) ?= -303
 
+  object Module {
+    type OpTypes = AddOne :: XTwo :: Neg :: Half :: TNilK
+    type Op[A] = CopK[OpTypes, A]
+  }
+
+  // not found: type Op
+  val evalSummonModule = CopK.FunctionK.summon[Module.Op, Id]
+
+  // not found: type Op
+  val evalOfModule     = CopK.FunctionK.of[Module.Op, Id](
+    evalAddOne, evalXTwo, evalHalf, evalNeg)
 }
