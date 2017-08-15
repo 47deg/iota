@@ -77,6 +77,7 @@ private[internal] object IotaMacroToolbelt {
 private[internal] class IotaMacroToolbelt[C <: Context] private(val c: C)
     extends MacroToolbelt
     with CoproductAPIs
+    with CoproductMacroAPIs
     with TypeListMacroAPIs
     with TypeListBuilders { override type Cc = C }
 
@@ -300,6 +301,11 @@ private[internal] sealed trait CoproductAPIs { self: Toolbelt =>
       case t => Left(s"unexpected type $t ${showRaw(t)} when destructuring CopK $tpe")
     }
 
+}
+
+private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
+  import u._
+
   /** Converts an eta expanded `PolyType` such as `[z]Either[String, z]`
     * into a type lambda `Tree` `({ type ξ$[z] = Either[String, z] })#ξ$`.
     * The parameter `z` is taken from the original type and used in
@@ -319,8 +325,8 @@ private[internal] sealed trait CoproductAPIs { self: Toolbelt =>
     */
   private[this] final def toTypeTree(tpe: Type): Tree = tpe match {
     case poly: PolyType       => projectPoly(poly)
-    case TypeRef(_, sym, Nil) => Ident(sym.name)
-    case _                    => Ident(tpe.typeSymbol.name)
+    case TypeRef(_, sym, Nil) => c.internal.gen.mkAttributedIdent(sym)
+    case _                    => c.internal.gen.mkAttributedIdent(tpe.typeSymbol)
   }
 
   final def defineFastFunctionK(

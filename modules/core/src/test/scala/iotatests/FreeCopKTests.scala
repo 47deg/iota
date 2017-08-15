@@ -87,10 +87,10 @@ object FreeCopK extends Properties("FreeCopK") {
     type Op[A] = CopK[OpTypes, A]
   }
 
-  // not found: type Op
+  // must compile
   val evalSummonModule = CopK.FunctionK.summon[Module.Op, Id]
 
-  // not found: type Op
+  // must compile
   val evalOfModule     = CopK.FunctionK.of[Module.Op, Id](
     evalAddOne, evalXTwo, evalHalf, evalNeg)
 }
