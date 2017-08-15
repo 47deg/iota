@@ -75,7 +75,7 @@ object ProjectPlugin extends AutoPlugin {
     connectInput in run := true,
     cancelable in Global := true,
 
-    scalaOrganization := "org.typelevel",    
+    scalaOrganization := "org.typelevel",
     crossScalaVersions:=  List("2.11.8", "2.12.1"),
     scalaVersion      := "2.12.1",
 
@@ -85,6 +85,11 @@ object ProjectPlugin extends AutoPlugin {
       "-Yno-predef",
       "-Ypartial-unification",
       "-Yliteral-types"),
+
+    scalacOptions := (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => scalacOptions.value
+      case _             => scalacOptions.value.filter(_ != "-Xfatal-warnings")
+    }),
 
     scalacOptions in (Compile, doc) :=
       (scalacOptions in (Compile, doc)).value.filter(_ != "-Xfatal-warnings")
