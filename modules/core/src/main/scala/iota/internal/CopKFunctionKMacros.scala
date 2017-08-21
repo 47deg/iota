@@ -40,8 +40,8 @@ final class CopKFunctionKMacros(val c: Context) {
     val G = evG.tpe
 
     tb.foldAbort(for {
-      copK <- tb.destructCopK(F).leftMap(NonEmptyList.of(_))
-      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.of(_))
+      copK <- tb.destructCopK(F).leftMap(NonEmptyList.one(_))
+      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.one(_))
 
       unorderedPairs <- Traverse[List].traverse(args.toList)(arg =>
         destructFunctionKInput(arg.tree.tpe, G).map((_, arg.tree))).toEither
@@ -62,8 +62,8 @@ final class CopKFunctionKMacros(val c: Context) {
     val G = evG.tpe
 
     tb.foldAbort(for {
-      copK <- tb.destructCopK(F).leftMap(NonEmptyList.of(_))
-      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.of(_))
+      copK <- tb.destructCopK(F).leftMap(NonEmptyList.one(_))
+      tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.one(_))
 
       arrs <- Traverse[List].traverse(tpes)(tpe =>
                 summonFunctionK(tpe, G)).toEither
@@ -98,7 +98,7 @@ final class CopKFunctionKMacros(val c: Context) {
     Validated
       .catchOnly[TypecheckException](
         c.typecheck(q"_root_.scala.Predef.implicitly[_root_.cats.arrow.FunctionK[$F, $G]]"))
-      .leftMap(t => NonEmptyList.of(t.msg))
+      .leftMap(t => NonEmptyList.one(t.msg))
 
   private[this] def destructFunctionKInput(tpe: Type, G: Type): ValidatedNel[String, Type] =
     tpe match {

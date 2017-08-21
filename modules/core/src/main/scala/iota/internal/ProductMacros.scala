@@ -37,7 +37,7 @@ private[iota] final class ProductMacros(val c: Context) {
     val L = evL.tpe
 
     tb.foldAbort(for {
-      algebras <- tb.memoizedTListTypes(L).leftMap(NonEmptyList.of(_))
+      algebras <- tb.memoizedTListTypes(L).leftMap(NonEmptyList.one(_))
       argTypes  = args.toList.map(_.tree.tpe)
       _        <- require(argTypes.length == algebras.length,
                     s"Expected ${algebras.length} arguments but received ${argTypes.length}")
@@ -49,6 +49,6 @@ private[iota] final class ProductMacros(val c: Context) {
   }
 
   private[this] def require(flag: Boolean, msg: => String): Either[NonEmptyList[String], Unit] =
-    Either.cond(flag, (), msg).leftMap(NonEmptyList.of(_))
+    Either.cond(flag, (), msg).leftMap(NonEmptyList.one(_))
 
 }
