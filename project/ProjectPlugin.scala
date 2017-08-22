@@ -53,7 +53,7 @@ object ProjectPlugin extends AutoPlugin {
       ScalaJSBadge.apply(_),
       GitHubIssuesBadge.apply(_)
     ),
-    orgSupportedScalaJSVersion := Some("0.6.15"),
+
     orgScriptTaskListSetting := List(
       orgValidateFiles.asRunnableItem,
       "clean".asRunnableItemFull,
@@ -75,16 +75,14 @@ object ProjectPlugin extends AutoPlugin {
     connectInput in run := true,
     cancelable in Global := true,
 
-    scalaOrganization := "org.typelevel",
-    crossScalaVersions:=  List("2.11.8", "2.12.1"),
-    scalaVersion      := "2.12.1",
+    crossScalaVersions :=  List("2.11.11", "2.12.3"),
+    scalaVersion       := "2.12.3",
 
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
       "-Ywarn-unused-import",
       "-Yno-predef",
-      "-Ypartial-unification",
-      "-Yliteral-types"),
+      "-Ypartial-unification"),
 
     scalacOptions := (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => scalacOptions.value
