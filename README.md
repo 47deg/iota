@@ -230,4 +230,4 @@ Copyright (C) 2016-2017 47 Degrees. <http://47deg.com>
 
 [comment]: # (End Copyright)
 
-[free example]: modules/core/src/test/scala/iotatests/FreeCopKTests.scala
+[free example]: modules/tests/src/test/scala/iotatests/FreeCopKTests.scala
