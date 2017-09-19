@@ -21,7 +21,7 @@ import iota._
 import org.scalacheck._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop._
-import org.scalacheck.Shapeless._
+import org.scalacheck.ScalacheckShapeless._
 
 object CopKTests extends Properties("CopKTests") {
 

@@ -65,7 +65,7 @@ object AutoTLSPlugin extends AutoPlugin {
 
   private[this] def hasKey(s: Setting[_], searchKey: AttributeKey[_]): Boolean =
     s.key match {
-      case ScopedKey(Scope(_, Global, Global, _), key) if key == searchKey => true
+      case ScopedKey(Scope(_, Zero, Zero, _), key) if key == searchKey => true
       case _ => false
     }
 

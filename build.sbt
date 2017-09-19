@@ -10,8 +10,8 @@ lazy val core = module("core", hideFolder = true)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core"),
-    %%("cats-free")
+    %%("cats-core", V.cats),
+    %%("cats-free", V.cats)
   )
 
 lazy val coreJVM = core.jvm
@@ -64,23 +64,27 @@ lazy val bench = jvmModule("bench")
   .settings(macroSettings)
   .settings(libraryDependencies ++= Seq(
     %%("scalacheck")))
-  .settings(inConfig(Compile)(
-    sourceGenerators += Def.task {
-      val path = (sourceManaged in(Compile, compile)).value / "bench.scala"
-      (runner in (Codegen, run)).value.run(
-        "iota.bench.BenchBoiler",
-        Attributed.data((fullClasspath in Codegen).value),
-        path.toString :: Nil,
-        streams.value.log)
-      path :: Nil
-    }
-  ))
+//   .settings(inConfig(Compile)(
+//     sourceGenerators += Def.task {
+//       val path = (sourceManaged in(Compile, compile)).value / "bench.scala"
+//       (runner in (Codegen, run)).value.run(
+//         "iota.bench.BenchBoiler",
+//         Attributed.data((fullClasspath in Codegen).value),
+//         path.toString :: Nil,
+//         streams.value.log)
+//       path :: Nil
+//     }
+//   ))
 
 lazy val Codegen = config("codegen").hide
 
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
 pgpPublicRing := file(s"$gpgFolder/pubring.asc")
 pgpSecretRing := file(s"$gpgFolder/secring.asc")
+
+lazy val V = new {
+  val cats = "1.0.0-MF"
+}
 
 lazy val macroSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
