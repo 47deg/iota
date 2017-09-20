@@ -64,17 +64,17 @@ lazy val bench = jvmModule("bench")
   .settings(macroSettings)
   .settings(libraryDependencies ++= Seq(
     %%("scalacheck")))
-//   .settings(inConfig(Compile)(
-//     sourceGenerators += Def.task {
-//       val path = (sourceManaged in(Compile, compile)).value / "bench.scala"
-//       (runner in (Codegen, run)).value.run(
-//         "iota.bench.BenchBoiler",
-//         Attributed.data((fullClasspath in Codegen).value),
-//         path.toString :: Nil,
-//         streams.value.log)
-//       path :: Nil
-//     }
-//   ))
+  .settings(inConfig(Compile)(
+    sourceGenerators += Def.task {
+      val path = (sourceManaged in(Compile, compile)).value / "bench.scala"
+      (runner in (Codegen, run)).value.run(
+        "iota.bench.BenchBoiler",
+        Attributed.data((fullClasspath in Codegen).value),
+        path.toString :: Nil,
+        streams.value.log)
+      path :: Nil
+    }
+  ))
 
 lazy val Codegen = config("codegen").hide
 

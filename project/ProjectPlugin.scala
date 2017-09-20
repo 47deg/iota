@@ -68,7 +68,6 @@ object ProjectPlugin extends AutoPlugin {
     orgMaintainersSetting += Dev("andyscott", Some("Andy Scott (twitter: [@andygscott](https://twitter.com/andygscott))"), Some("andy.g.scott@gmail.com")),
 
     coverageFailOnMinimum := false,
-    fork in run := true,
     fork in Test := !isScalaJSProject.value,
     parallelExecution in Test := false,
     outputStrategy := Some(StdoutOutput),
