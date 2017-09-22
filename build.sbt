@@ -10,8 +10,8 @@ lazy val core = module("core", hideFolder = true)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core", V.cats),
-    %%("cats-free", V.cats)
+    %%("cats-core"),
+    %%("cats-free")
   )
 
 lazy val coreJVM = core.jvm
@@ -81,10 +81,6 @@ lazy val Codegen = config("codegen").hide
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
 pgpPublicRing := file(s"$gpgFolder/pubring.asc")
 pgpSecretRing := file(s"$gpgFolder/secring.asc")
-
-lazy val V = new {
-  val cats = "1.0.0-MF"
-}
 
 lazy val macroSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
