@@ -74,4 +74,5 @@ package object iota {
   //#-2.11
 
   private[iota] type SingletonInt = Int with Singleton
+  private[iota] type SingletonString = String with Singleton
 }

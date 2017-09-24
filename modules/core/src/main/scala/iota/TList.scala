@@ -60,4 +60,17 @@ object TList {
       macro internal.TypeListMacros.materializeTListCompute[L, O]
   }
 
+  trait Gen[A] {
+    type Repr <: TList
+  }
+
+  object Gen {
+    type Aux[A, R <: TList] = Gen[A] { type Repr = R }
+
+    def apply[A](implicit ev: Gen[A]): Gen.Aux[A, ev.Repr] = ev
+    implicit def materializeGen[A, R <: TList]: Aux[A, R] =
+      macro internal.TypeListMacros.materializeTListGen[A, R]
+  }
+
+
 }
