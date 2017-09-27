@@ -18,10 +18,17 @@ package iota  //#=cats
 package iotaz //#=scalaz
 package internal
 
+//#+cats
 import cats._
 import cats.data._
 import cats.instances.all._
 import cats.syntax.either._ //#=2.12
+//#-cats
+
+//#+scalaz
+import scalaz._
+import scalaz.std.list._
+//#-scalaz
 
 import scala.reflect.macros.whitebox.Context
 import scala.reflect.macros.TypecheckException
@@ -49,7 +56,7 @@ final class CopKFunctionKMacros(val c: Context) {
       lookup = unorderedPairs.toMap
 
       arrs <- Traverse[List].traverse(tpes)(tpe =>
-        lookup.get(tpe).toRight(s"Missing interpreter FunctionK[$tpe, $G]").toValidatedNel).toEither
+        lookup.get(tpe).toRight(s"Missing interpreter FunctionK[$tpe, $G]").toAvowalNel).toEither
     } yield makeInterpreter(F, copK.L, G, arrs))
   }
 
@@ -95,19 +102,19 @@ final class CopKFunctionKMacros(val c: Context) {
     q"""$defn; new $name"""
   }
 
-  private[this] def summonFunctionK(F: Type, G: Type): ValidatedNel[String, Tree] =
-    Validated
-      .catchOnly[TypecheckException](
+  private[this] def summonFunctionK(F: Type, G: Type): AvowalNel[String, Tree] =
+    Avowal
+      .catching[TypecheckException](
         c.typecheck(q"_root_.scala.Predef.implicitly[_root_.cats.arrow.FunctionK[$F, $G]]"))
       .leftMap(t => NonEmptyList.one(t.msg))
 
-  private[this] def destructFunctionKInput(tpe: Type, G: Type): ValidatedNel[String, Type] =
+  private[this] def destructFunctionKInput(tpe: Type, G: Type): AvowalNel[String, Type] =
     tpe match {
-      case TypeRef(_, sym, f :: g :: Nil) if g =:= G => Validated.valid(f)
+      case TypeRef(_, sym, f :: g :: Nil) if g =:= G => Avowal.yes(f)
       case RefinedType(anyRef :: tpe2 :: Nil, scope) => // TODO: check anyRef is scala.AnyRef
         destructFunctionKInput(tpe2.dealias, G)
       case _ =>
-        Validated.invalidNel(s"unable to destruct input $tpe as FunctionK[?, $G]\n" +
+        Avowal.noNel(s"unable to destruct input $tpe as FunctionK[?, $G]\n" +
           s"  underlying type tree: ${showRaw{tpe}} (class ${tpe.getClass})")
     }
 }

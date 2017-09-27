@@ -18,6 +18,7 @@ package iota  //#=cats
 package iotaz //#=scalaz
 package internal
 
+//#+cats
 import cats.Applicative
 import cats.Eval
 import cats.Functor
@@ -27,10 +28,21 @@ import cats.free.Cofree
 import cats.syntax.applicative._
 import cats.syntax.flatMap._
 import cats.syntax.traverse._
+//#-cats
 
-/** A gross oversimplification/hack of Matryoshka, but for Cats
-  * instead of Scalaz, and also tailored to the specific needs
-  * of Iota.
+//#+scalaz
+import scalaz.Applicative
+import scalaz.Cofree
+import scalaz.Functor
+import scalaz.Monad
+import scalaz.Traverse
+import scalaz.syntax.applicative._
+import scalaz.syntax.bind._
+import scalaz.syntax.traverse._
+//#-scalaz
+
+/** A gross oversimplification/hack of Matryoshka tailored to the
+  * specific needs of Iota. This works for both Cats and Scalaz.
   *
   * The vast majoriy of this file is derived/copied/modified from
   * Matryoshka, which is also licensed under the Apache License,
@@ -59,7 +71,7 @@ private[internal] object catryoshka {
     (implicit M: Monad[M], F: Traverse[F])
       : M[B] =
     hylo[ λ[α => M[F[α]]], A, M[B] ](a)(
-      fb => M.flatMap(fb)(b => M.flatMap(F.sequence(b))(algM)),
+      fb => fb >>= (b => b.sequence >>= algM),
       coalgM)(M compose F)
 
   trait Based[T] {
@@ -147,21 +159,35 @@ private[internal] object catryoshka {
   object EnvT {
     implicit def envTTraverse[Z, F[_]](implicit F: Traverse[F]): Traverse[EnvT[Z, F, ?]] =
       new Traverse[EnvT[Z, F, ?]] {
+
+        //#+cats
         def traverse[G[_], A, B](fa: EnvT[Z, F, A])(f: A => G[B])(implicit G: Applicative[G]): G[EnvT[Z, F, B]] =
-          G.map(F.traverse(fa.lower)(f))(EnvT(fa.ask, _))
+          traverseImpl[G, A, B](fa)(f)
 
         def foldLeft[A, B](fa: EnvT[Z, F, A], b: B)(f: (B, A) => B): B =
           F.foldLeft(fa.lower, b)(f)
 
         def foldRight[A, B](fa: EnvT[Z, F, A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
           F.foldRight(fa.lower, lb)(f)
+        //#-cats
+
+        @inline private[this] //#=cats
+        def traverseImpl[G[_], A, B](fa: EnvT[Z, F, A])(f: A => G[B])(implicit G: Applicative[G]): G[EnvT[Z, F, B]] =
+          G.map(F.traverse(fa.lower)(f))(EnvT(fa.ask, _))
       }
   }
 
   implicit def cofreeBirecursive[F[_], A]: Birecursive.Aux[Cofree[F, A], EnvT[A, F, ?]] =
     Birecursive.algebraIso(
+      //#+cats
       t => Cofree(t.ask, Eval.later(t.lower)),
-      t => EnvT(t.head, t.tail.value))
+      t => EnvT(t.head, t.tail.value)
+      //#-cats
+      //#+scalaz
+      t => Cofree(t.ask, t.lower),
+      t => EnvT(t.head, t.tail)
+      //#-scalaz
+    )
 
   implicit final class AlgebraOps[F[_], A](val self: F[A] => A) extends AnyVal {
     // note: above, Algebra[F, A] is expanded to F[A] => A because this

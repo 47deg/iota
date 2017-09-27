@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import cats.data._ //#=2.11
+import scala.reflect.ClassTag
 
 package object
   iota  //#=cats
@@ -42,8 +42,30 @@ package object
     */
   type TConsK[H[_], T <: TListK] <: TListK
 
+  // -- internals --
+
+  private[iota]  //#=cats
+  private[iotaz] //#=scalaz
+  type SingletonInt = Int with Singleton
+
+  // compatability layer for cross compiling against various
+  // combinations of 2.11/2.12 + cats/scalaz
+
+  // either compat
+
+  private[iota]  //#=cats
+  private[iotaz] //#=scalaz
+  implicit final class ToEitherCompatOps[A](
+    val obj: A
+  ) extends AnyVal {
+    def asLeft[B]: Either[A, B]  = Left(obj)
+    def asRight[B]: Either[B, A] = Right(obj)
+  }
+
   //#+2.11
-  private[iota] implicit final class EitherCompatOps[A, B](
+  private[iota]  //#=cats
+  private[iotaz] //#=scalaz
+  implicit final class Scala211_EitherCompatOps[A, B](
     val eab: Either[A, B]
   ) extends AnyVal {
     def flatMap[AA >: A, C](f: B => Either[AA, C]): Either[AA, C] =
@@ -54,29 +76,94 @@ package object
       case Left(a)      => Left(f(a))
       case r @ Right(_) => r.asInstanceOf[Either[C, B]]
     }
-    def toValidated: Validated[A, B] = eab match {
-      case Left(a)  => Validated.invalid(a)
-      case Right(b) => Validated.valid(b)
-    }
-    def toValidatedNel[AA >: A]: ValidatedNel[AA, B] = eab match {
-      case Left(a)  => Validated.invalidNel(a)
-      case Right(b) => Validated.valid(b)
-    }
     def filterOrElse[AA >: A](p: B => Boolean, zero: => AA): Either[AA, B] = eab match {
       case Right(b) => if (p(b)) eab else Left(zero)
       case Left(a)  => eab
     }
   }
-
-  private[iota] implicit final class ToEitherCompatOps[A](
-    val obj: A
-  ) extends AnyVal {
-    def asLeft[B]: Either[A, B]  = Left(obj)
-    def asRight[B]: Either[B, A] = Right(obj)
-  }
   //#-2.11
+
+  //#+2.12
+  //#+scalaz
+  private[iotaz]
+  implicit final class Scala212_Scalaz_EitherCompatOps[A, B](
+    val eab: Either[A, B]
+  ) extends AnyVal {
+    def leftMap[C](f: A => C): Either[C, B] = eab match {
+      case Left(a)      => Left(f(a))
+      case r @ Right(_) => r.asInstanceOf[Either[C, B]]
+    }
+  }
+  //#-scalaz
+  //#-2.12
+
+  // "avowal" aka validation/validated compat
+
+  //#+cats
+  import cats.NotNull
+  import cats.data.Validated
+  import cats.data.ValidatedNel
+
+  type Avowal[A, B]    = Validated[A, B]
+  type AvowalNel[A, B] = ValidatedNel[A, B]
+
+  object Avowal {
+    def yes  [A, B](b: B): Avowal[A, B]    = Validated.valid(b)
+    def no   [A, B](a: A): Avowal[A, B]    = Validated.invalid(a)
+    def noNel[A, B](a: A): AvowalNel[A, B] = Validated.invalidNel(a)
+
+    def catching[T >: Null <: Throwable]: CatchingPartiallyApplied[T] =
+      new CatchingPartiallyApplied[T]
+
+    private[Avowal] final class CatchingPartiallyApplied[T >: Null <: Throwable] {
+      def apply[A](f: => A)(implicit T: ClassTag[T], NT: NotNull[T]): Avowal[T, A] =
+        Validated.catchOnly[T](f)
+    }
+  }
+  //#-cats
+
+  //#+scalaz
+  import scalaz.NonEmptyList
+  import scalaz.NotNothing
+  import scalaz.Validation
+  import scalaz.ValidationNel
+
+  private[iotaz] implicit final class NonEmptyListCompanionOps(
+    val companion: NonEmptyList.type
+  ) extends AnyVal {
+    def one[A](head: A): scalaz.NonEmptyList[A] = scalaz.NonEmptyList(head)
+  }
+
+  type Avowal[A, B]    = Validation[A, B]
+  type AvowalNel[A, B] = ValidationNel[A, B]
+
+  object Avowal {
+    def yes  [A, B](b: B): Avowal[A, B]    = Validation.success(b)
+    def no   [A, B](a: A): Avowal[A, B]    = Validation.failure(a)
+    def noNel[A, B](a: A): AvowalNel[A, B] = Validation.failureNel(a)
+
+    def catching[T >: Null <: Throwable]: CatchingPartiallyApplied[T] =
+      new CatchingPartiallyApplied[T]
+
+    private[Avowal] final class CatchingPartiallyApplied[T >: Null <: Throwable] {
+      def apply[A](f: => A)(implicit T: ClassTag[T], NT: NotNothing[T]): Avowal[T, A] =
+        Validation.fromTryCatchThrowable[A, T](f)
+    }
+  }
+  //#-scalaz
 
   private[iota]  //#=cats
   private[iotaz] //#=scalaz
-  type SingletonInt = Int with Singleton
+  implicit final class EitherToAvowalOps[A, B](
+    val eab: Either[A, B]
+  ) extends AnyVal {
+    def toAvowal: Avowal[A, B] = eab match {
+      case Left(a)  => Avowal.no(a)
+      case Right(b) => Avowal.yes(b)
+    }
+    def toAvowalNel[AA >: A]: AvowalNel[AA, B] = eab match {
+      case Left(a)  => Avowal.noNel(a)
+      case Right(b) => Avowal.yes(b)
+    }
+  }
 }

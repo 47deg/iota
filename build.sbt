@@ -4,6 +4,7 @@ lazy val root = (project in file("."))
   .aggregate(testsJVM, testsJS)
   .aggregate(examplesJVM, examplesJS)
   .aggregate(bench)
+  .aggregate(corezJVM, corezJS)
 
 lazy val core = module("core", hideFolder = true)
   .settings(macroSettings)
@@ -24,8 +25,7 @@ lazy val corez = module("corez", hideFolder = true)
     flags    = "scalaz" :: Nil,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core"),
-    %%("cats-free"))
+    "org.scalaz" %% "scalaz-core" % "7.2.15")
 
 lazy val corezJVM = corez.jvm
 lazy val corezJS  = corez.js
