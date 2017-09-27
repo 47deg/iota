@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 
 /** A heterogenous list of types */
 trait TList

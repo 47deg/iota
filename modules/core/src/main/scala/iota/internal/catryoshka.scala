@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import cats.Applicative

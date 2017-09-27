@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 
 /** Implicit options to configure/control Iota's macros
   */

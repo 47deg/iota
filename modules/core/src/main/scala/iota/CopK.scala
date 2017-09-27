@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 
 import cats.~>
 
 /** A coproduct of type constructors captured by type constructor list `L` */
-final class CopK[LL <: TListK, A] private[iota](
+final class CopK[LL <: TListK, A] private(
   val index: Int,
   val value: Any
 ) {

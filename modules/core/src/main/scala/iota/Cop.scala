@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 
 /** A coproduct of types captured by type list `L` */
-final class Cop[LL <: TList] private[iota](
+final class Cop[LL <: TList] private(
   val index: Int,
   val value: Any
 ) {

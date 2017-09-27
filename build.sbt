@@ -8,14 +8,26 @@ lazy val root = (project in file("."))
 lazy val core = module("core", hideFolder = true)
   .settings(macroSettings)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
+    flags    = "cats" :: Nil,
     yaxScala = true))
   .crossDepSettings(
     %%("cats-core"),
-    %%("cats-free")
-  )
+    %%("cats-free"))
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+
+lazy val corez = module("corez", hideFolder = true)
+  .settings(macroSettings)
+  .settings(yax(file("modules/core/src/main/scala"), Compile,
+    flags    = "scalaz" :: Nil,
+    yaxScala = true))
+  .crossDepSettings(
+    %%("cats-core"),
+    %%("cats-free"))
+
+lazy val corezJVM = corez.jvm
+lazy val corezJS  = corez.js
 
 lazy val tests = module("tests", hideFolder = true)
   .dependsOn(core)

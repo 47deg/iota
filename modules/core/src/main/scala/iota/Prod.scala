@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 
 import scala.collection.immutable.Seq
 
 /** A product of types captured by type list `LL` */
-final class Prod[LL <: TList] private[iota](
+final class Prod[LL <: TList] private(
   val values: Seq[Any]
 ) {
   type L = LL

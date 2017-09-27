@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import scala.reflect.macros.blackbox.Context
@@ -24,7 +25,9 @@ import cats.data.NonEmptyList
 import cats.instances.list._
 import cats.syntax.either._ //#=2.12
 
-private[iota] final class ProductMacros(val c: Context) {
+private[iota]  //#=cats
+private[iotaz] //#=scalaz
+final class ProductMacros(val c: Context) {
   import c.universe._
 
   private[this] val tb = IotaMacroToolbelt(c)

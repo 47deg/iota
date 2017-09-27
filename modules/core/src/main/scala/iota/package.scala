@@ -16,7 +16,10 @@
 
 import cats.data._ //#=2.11
 
-package object iota {
+package object
+  iota  //#=cats
+  iotaz //#=scalaz
+{
 
   /** The terminal element of a type list */
   type TNil <: TList
@@ -73,5 +76,7 @@ package object iota {
   }
   //#-2.11
 
-  private[iota] type SingletonInt = Int with Singleton
+  private[iota]  //#=cats
+  private[iotaz] //#=scalaz
+  type SingletonInt = Int with Singleton
 }

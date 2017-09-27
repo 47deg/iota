@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import scala.reflect.macros.whitebox.Context
 
-private[iota] final class TypeListMacros(val c: Context) {
+private[iota]  //#=cats
+private[iotaz] //#=scalaz
+final class TypeListMacros(val c: Context) {
   import c.universe._
 
   private[this] val tb = IotaMacroToolbelt(c)

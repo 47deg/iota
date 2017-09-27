@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import cats.Applicative
@@ -145,22 +146,22 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
   type TypeListParser = CoalgebraM[Either[Id[String], ?], NodeF, Type]
 
   final lazy val tlistParser: TypeListParser = typeListParser(
-    NilSym     = symbolOf[iota.TNil],
-    ConsSym    = symbolOf[iota.TCons[Nothing, Nothing]],
-    ConcatSym  = symbolOf[iota.TList.Op.Concat[Nothing, Nothing]],
-    ReverseSym = symbolOf[iota.TList.Op.Reverse[Nothing]],
-    TakeSym    = symbolOf[iota.TList.Op.Take[Nothing, Nothing]],
-    DropSym    = symbolOf[iota.TList.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[iota.TList.Op.Remove[Nothing, Nothing]])
+    NilSym     = symbolOf[TNil],
+    ConsSym    = symbolOf[TCons[Nothing, Nothing]],
+    ConcatSym  = symbolOf[TList.Op.Concat[Nothing, Nothing]],
+    ReverseSym = symbolOf[TList.Op.Reverse[Nothing]],
+    TakeSym    = symbolOf[TList.Op.Take[Nothing, Nothing]],
+    DropSym    = symbolOf[TList.Op.Drop[Nothing, Nothing]],
+    RemoveSym  = symbolOf[TList.Op.Remove[Nothing, Nothing]])
 
   final lazy val tlistkParser: TypeListParser = typeListParser(
-    NilSym     = symbolOf[iota.TNilK],
-    ConsSym    = symbolOf[iota.TConsK[Nothing, Nothing]],
-    ConcatSym  = symbolOf[iota.TListK.Op.Concat[Nothing, Nothing]],
-    ReverseSym = symbolOf[iota.TListK.Op.Reverse[Nothing]],
-    TakeSym    = symbolOf[iota.TListK.Op.Take[Nothing, Nothing]],
-    DropSym    = symbolOf[iota.TListK.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[iota.TListK.Op.Remove[Nothing, Nothing]])
+    NilSym     = symbolOf[TNilK],
+    ConsSym    = symbolOf[TConsK[Nothing, Nothing]],
+    ConcatSym  = symbolOf[TListK.Op.Concat[Nothing, Nothing]],
+    ReverseSym = symbolOf[TListK.Op.Reverse[Nothing]],
+    TakeSym    = symbolOf[TListK.Op.Take[Nothing, Nothing]],
+    DropSym    = symbolOf[TListK.Op.Drop[Nothing, Nothing]],
+    RemoveSym  = symbolOf[TListK.Op.Remove[Nothing, Nothing]])
 
   private[this] def symbolOf[T](implicit evT: WeakTypeTag[T]): Symbol = evT.tpe.typeSymbol
 
@@ -280,9 +281,9 @@ private[internal] sealed trait CoproductAPIs { self: Toolbelt =>
   case class CopKTypes(L: Type, A: Type)
 
   private[this] final lazy val CopTpe =
-    typeOf[iota.Cop[Nothing]].etaExpand.resultType
+    typeOf[Cop[Nothing]].etaExpand.resultType
   private[this] final lazy val CopKTpe =
-    typeOf[iota.CopK[Nothing, Nothing]].etaExpand.resultType
+    typeOf[CopK[Nothing, Nothing]].etaExpand.resultType
 
   private[this] def resultType(sym: Symbol): Type =
     sym.asType.toType.etaExpand.resultType
