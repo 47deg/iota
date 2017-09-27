@@ -19,6 +19,7 @@ lazy val coreJS  = core.js
 
 lazy val corez = module("corez", hideFolder = true)
   .settings(macroSettings)
+  .settings(noPublishSettings)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     flags    = "scalaz" :: Nil,
     yaxScala = true))
