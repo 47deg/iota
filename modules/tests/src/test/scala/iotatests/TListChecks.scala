@@ -19,6 +19,7 @@ package iotatests
 import iota._
 
 object TListChecks {
+  import TestSingletonLiterals._
 
   import TList.Compute
   import TList.Op._
@@ -39,7 +40,7 @@ object TListChecks {
   check[Concat[StringIntL, IntStringL],
     String :: Int :: Int :: String :: TNil]
 
-  check[Take[3, Double :: Drop[1, Concat[Reverse[StringIntL], StringIntL]]],
+  check[Take[`3`, Double :: Drop[`1`, Concat[Reverse[StringIntL], StringIntL]]],
     Double :: String :: String :: TNil]
 
   type StringInt = Cop[StringIntL]

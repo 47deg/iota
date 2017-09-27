@@ -193,7 +193,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
   }
 
   private[this] def literalInt(tpe: Type): Either[Id[String], Int] =
-    tpe match {
+    tpe.dealias match {
       case ConstantType(Constant(value: Int)) => value.asRight
       case _ => s"Expected $tpe to be a literal integer".asLeft
     }

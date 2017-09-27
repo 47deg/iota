@@ -4,11 +4,12 @@ import cats._
 import iota._
 
 object CopKFunctionKTests {
+  import TestSingletonLiterals._
 
   import TListK.::
 
-  type FooOp[A] = A with "foo"
-  type BarOp[A] = A with "bar"
+  type FooOp[A] = A with `"foo"`
+  type BarOp[A] = A with `"bar"`
 
   implicit val interpFooOp: FooOp ~> Either[String, ?] =
     new (FooOp ~> Either[String, ?]) {

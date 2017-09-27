@@ -33,16 +33,10 @@ lazy val tests = module("tests", hideFolder = true)
   .dependsOn(core)
   .settings(noPublishSettings)
   .settings(macroSettings)
+  .settings(yax(file("modules/tests/src/main/scala"), Compile,
+    yaxPlatform = true))
   .settings(yax(file("modules/tests/src/test/scala"), Test,
     yaxPlatform = true))
-  .settings(
-    scalaOrganization := "org.typelevel",
-    scalaVersion      := "2.12.3-bin-typelevel-4",
-    scalacOptions     += "-Yliteral-types")
-  .settings(
-    libraryDependencies := libraryDependencies.value.map { d =>
-      if (d.name != "scalajs-compiler") d
-      else d.cross(CrossVersion.patch) })
   .crossDepSettings(
     %%("scalacheck")      % "test",
     %%("shapeless")       % "test",

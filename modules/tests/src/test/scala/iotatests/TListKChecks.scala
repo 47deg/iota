@@ -19,6 +19,7 @@ package iotatests
 import iota._
 
 object TListKChecks {
+  import TestSingletonLiterals._
 
   import TListK.Compute
   import TListK.Op._
@@ -39,7 +40,7 @@ object TListKChecks {
   check[Concat[OptionListL, ListOptionL],
     Option :: List :: List :: Option :: TNilK]
 
-  check[Take[3, List :: Drop[1, Concat[Reverse[OptionListL], OptionListL]]],
+  check[Take[`3`, List :: Drop[`1`, Concat[Reverse[OptionListL], OptionListL]]],
     List :: Option :: Option :: TNilK]
 
   type OptionList[A] = CopK[OptionListL, A]
@@ -54,7 +55,7 @@ object TListKChecks {
   check[Concat[Reverse[OptionListL], OptionListL],
     List :: Option :: Option :: List :: TNilK]
 
-  check[Drop[1, OptionListL], List :: TNilK]
+  check[Drop[`1`, OptionListL], List :: TNilK]
 
   check[Remove[Option, OptionListL], List :: TNilK]
   check[Remove[List, OptionListL], Option :: TNilK]

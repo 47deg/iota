@@ -28,6 +28,7 @@ import cats.instances.either._
 import catryoshka._
 
 import iotatests.FooAndFriends._
+import iotatests.TestSingletonLiterals._
 
 object TypeListParserChecks extends Properties("TypeListParsers") {
 
@@ -70,11 +71,11 @@ class TypeListParserChecks(
       cons[Foo](cons[Bar](cons[Baz]()))
     ),
 
-    t[TTake[0, BazBarFoo#L]] -> take(0, cons[Baz](cons[Bar](cons[Foo]()))),
-    t[TTake[1, BazBarFoo#L]] -> take(1, cons[Baz](cons[Bar](cons[Foo]()))),
+    t[TTake[`0`, BazBarFoo#L]] -> take(0, cons[Baz](cons[Bar](cons[Foo]()))),
+    t[TTake[`1`, BazBarFoo#L]] -> take(1, cons[Baz](cons[Bar](cons[Foo]()))),
 
-    t[TDrop[2, BazBarFoo#L]] -> drop(2, cons[Baz](cons[Bar](cons[Foo]()))),
-    t[TDrop[3, BazBarFoo#L]] -> drop(3, cons[Baz](cons[Bar](cons[Foo]()))),
+    t[TDrop[`2`, BazBarFoo#L]] -> drop(2, cons[Baz](cons[Bar](cons[Foo]()))),
+    t[TDrop[`3`, BazBarFoo#L]] -> drop(3, cons[Baz](cons[Bar](cons[Foo]()))),
 
     t[TRemove[Baz, BazBarFoo#L]] -> remove[Baz](cons[Baz](cons[Bar](cons[Foo]()))),
     t[TRemove[Foo, BazBarFoo#L]] -> remove[Foo](cons[Baz](cons[Bar](cons[Foo]())))
@@ -99,11 +100,11 @@ class TypeListParserChecks(
       consk[FooK](consk[BarK](consk[BazK]()))
     ),
 
-    t[KTake[0, BazBarFooK[_]#L]] -> take(0, consk[BazK](consk[BarK](consk[FooK]()))),
-    t[KTake[1, BazBarFooK[_]#L]] -> take(1, consk[BazK](consk[BarK](consk[FooK]()))),
+    t[KTake[`0`, BazBarFooK[_]#L]] -> take(0, consk[BazK](consk[BarK](consk[FooK]()))),
+    t[KTake[`1`, BazBarFooK[_]#L]] -> take(1, consk[BazK](consk[BarK](consk[FooK]()))),
 
-    t[KDrop[2, BazBarFooK[_]#L]] -> drop(2, consk[BazK](consk[BarK](consk[FooK]()))),
-    t[KDrop[3, BazBarFooK[_]#L]] -> drop(3, consk[BazK](consk[BarK](consk[FooK]()))),
+    t[KDrop[`2`, BazBarFooK[_]#L]] -> drop(2, consk[BazK](consk[BarK](consk[FooK]()))),
+    t[KDrop[`3`, BazBarFooK[_]#L]] -> drop(3, consk[BazK](consk[BarK](consk[FooK]()))),
 
     t[KRemove[BazK, BazBarFooK[_]#L]] -> removek[BazK](consk[BazK](consk[BarK](consk[FooK]()))),
     t[KRemove[FooK, BazBarFooK[_]#L]] -> removek[FooK](consk[BazK](consk[BarK](consk[FooK]())))

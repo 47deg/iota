@@ -19,12 +19,13 @@ package iotatests
 import iota._
 
 object FooAndFriends {
+  import TestSingletonLiterals._
 
   import TList.::
 
   trait Foo
   type Bar = String
-  type Baz = Long with ("t", "t", "o", "c", "s")
+  type Baz = Long with `"baz"`
 
   type FooBarBazL = Foo :: Bar :: Baz :: TNil
   type BazBarFooL = Baz :: Bar :: Foo :: TNil
