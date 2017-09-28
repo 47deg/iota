@@ -1,4 +1,3 @@
-
 [comment]: # (Start Badges)
 
 [![Build Status](https://travis-ci.org/frees-io/iota.svg?branch=master)](https://travis-ci.org/frees-io/iota) [![Maven Central](https://img.shields.io/badge/maven%20central-0.3.0-green.svg)](https://oss.sonatype.org/#nexus-search;gav~io.frees~iota*) [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/frees-io/iota/master/LICENSE) [![Latest version](https://img.shields.io/badge/iota-0.3.0-green.svg)](https://index.scala-lang.org/frees-io/iota) [![Scala.js](http://scala-js.org/assets/badges/scalajs-0.6.17.svg)](http://scala-js.org) [![GitHub Issues](https://img.shields.io/github/issues/frees-io/iota.svg)](https://github.com/frees-io/iota/issues)
