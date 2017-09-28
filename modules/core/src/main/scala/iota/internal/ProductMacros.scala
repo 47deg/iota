@@ -56,7 +56,7 @@ final class ProductMacros(val c: Context) {
                     require(tpes._1 <:< tpes._2,
                       s"Expected ${tpes._1} <:< ${tpes._2}").toAvowal).toEither
     } yield
-      q"_root_.iota.Prod.unsafeApply[$L](_root_.scala.collection.immutable.IndexedSeq[_root_.scala.Any](..$args))")
+      q"${tb.iotaPackage}.Prod.unsafeApply[$L](_root_.scala.collection.immutable.IndexedSeq[_root_.scala.Any](..$args))")
   }
 
   private[this] def require(flag: Boolean, msg: => String): Either[NonEmptyList[String], Unit] =

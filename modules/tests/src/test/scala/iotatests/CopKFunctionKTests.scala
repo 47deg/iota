@@ -1,7 +1,10 @@
 package iotatests
 
-import cats._
-import iota._
+import cats._   //#=cats
+import scalaz._ //#=scalaz
+
+import iota._  //#=cats
+import iotaz._ //#=scalaz
 
 object CopKFunctionKTests {
   import TestSingletonLiterals._
@@ -21,6 +24,5 @@ object CopKFunctionKTests {
       def apply[A](fa: BarOp[A]): Either[String, A] = Right(fa)
     }
 
-  CopKFunctionK.summon[CopK[FooOp :: BarOp :: TNilK, ?], Either[String, ?]]
-
+  CopKNT.summon[CopK[FooOp :: BarOp :: TNilK, ?], Either[String, ?]]
 }

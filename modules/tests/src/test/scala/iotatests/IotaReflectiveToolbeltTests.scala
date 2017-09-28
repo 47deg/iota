@@ -18,10 +18,12 @@
 
 package iotatests
 
-import iota._
-import iota.internal.IotaReflectiveToolbelt
+import iota._  //#=cats
+import iotaz._ //#=scalaz
+import internal.IotaReflectiveToolbelt
 
-import cats.instances.all._
+import cats.instances.all._      //#=cats
+import scalaz.std.AllInstances._ //#=scalaz
 import scala.reflect.runtime.{ universe => runtimeUniverse }
 
 import org.scalacheck._

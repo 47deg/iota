@@ -16,7 +16,8 @@
 
 //#+jvm
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import scala.Predef.ArrowAssoc
@@ -24,7 +25,8 @@ import scala.Predef.ArrowAssoc
 import org.scalacheck._
 import org.scalacheck.Prop._
 
-import cats.instances.either._
+import cats.instances.either._ //#=cats
+import scalaz.std.either._     //#=scalaz
 import catryoshka._
 
 import iotatests.FooAndFriends._

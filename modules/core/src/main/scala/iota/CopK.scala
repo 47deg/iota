@@ -46,6 +46,12 @@ object CopK {
     */
   sealed abstract class Inject[F[_], G[_] <: CopK[_, _]]
       extends cats.InjectK[F, G] //#=cats
+  {
+    //#+scalaz
+    def inj: F ~> G
+    def prj: G ~> λ[α => Option[F[α]]]
+    //#-scalaz
+  }
 
   object Inject {
     def apply[F[_], G[_] <: CopK[_, _]](implicit ev: Inject[F, G]): Inject[F, G] = ev

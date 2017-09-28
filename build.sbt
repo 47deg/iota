@@ -5,6 +5,7 @@ lazy val root = (project in file("."))
   .aggregate(examplesJVM, examplesJS)
   .aggregate(bench)
   .aggregate(corezJVM, corezJS)
+  .aggregate(testszJVM, testszJS)
 
 lazy val core = module("core", hideFolder = true)
   .settings(macroSettings)
@@ -35,8 +36,10 @@ lazy val tests = module("tests", hideFolder = true)
   .settings(noPublishSettings)
   .settings(macroSettings)
   .settings(yax(file("modules/tests/src/main/scala"), Compile,
+    flags       = "cats" :: Nil,
     yaxPlatform = true))
   .settings(yax(file("modules/tests/src/test/scala"), Test,
+    flags       = "cats" :: Nil,
     yaxPlatform = true))
   .crossDepSettings(
     %%("scalacheck")      % "test",
@@ -45,6 +48,24 @@ lazy val tests = module("tests", hideFolder = true)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+
+lazy val testsz = module("testsz", hideFolder = true)
+  .dependsOn(corez)
+  .settings(noPublishSettings)
+  .settings(macroSettings)
+  .settings(yax(file("modules/tests/src/main/scala"), Compile,
+    flags       = "scalaz" :: Nil,
+    yaxPlatform = true))
+  .settings(yax(file("modules/tests/src/test/scala"), Test,
+    flags       = "scalaz" :: Nil,
+    yaxPlatform = true))
+  .crossDepSettings(
+    %%("scalacheck")      % "test",
+    %%("shapeless")       % "test",
+    %%("scheckShapeless") % "test")
+
+lazy val testszJVM = testsz.jvm
+lazy val testszJS  = testsz.js
 
 lazy val examples = module("examples")
   .dependsOn(core)

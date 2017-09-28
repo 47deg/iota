@@ -58,6 +58,12 @@ private[internal] trait MacroToolbelt extends Toolbelt {
 
   final override type Uu = c.universe.type
   final override val u: Uu = c.universe
+
+  import u._
+
+  final val iotaPackage: Tree =
+    q"_root_.iota"  //#=cats
+    q"_root_.iotaz" //#=scalaz
 }
 
 object IotaReflectiveToolbelt {
@@ -349,6 +355,10 @@ private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
     case _                    => c.internal.gen.mkAttributedIdent(tpe.typeSymbol)
   }
 
+  private[this] val FastNatTrans =
+    tq"$iotaPackage.internal.FastFunctionK" //#=cats
+    tq"$iotaPackage.internal.FastNaturalTransformation" //#=scalaz
+
   final def defineFastFunctionK(
     className: TypeName,
     F: Type, G: Type,
@@ -369,7 +379,7 @@ private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
     val toStringValue = s"FastFunctionK[$F, $G]<<generated>>"
 
     q"""
-    class $className extends _root_.iota.internal.FastFunctionK[$FF, $GG] {
+    class $className extends $FastNatTrans[$FF, $GG] {
       ..$preamble
       override def apply[$A]($fa: $FA): $GA =
         (${toIndex(fa)}: @_root_.scala.annotation.switch) match {

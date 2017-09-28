@@ -16,7 +16,8 @@
 
 package iotatests
 
-import iota._
+import iota._  //#=cats
+import iotaz._ //#=scalaz
 
 import org.scalacheck._
 import org.scalacheck.Arbitrary.arbitrary

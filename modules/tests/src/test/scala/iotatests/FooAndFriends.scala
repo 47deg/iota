@@ -16,7 +16,8 @@
 
 package iotatests
 
-import iota._
+import iota._  //#=cats
+import iotaz._ //#=scalaz
 
 object FooAndFriends {
   import TestSingletonLiterals._
@@ -37,7 +38,7 @@ object FooAndFriends {
   import TListK.:::
 
   trait FooK[A]
-  type BarK[A] = cats.data.NonEmptyList[A]
+  type BarK[A] = List[A]
   type BazK[A] = Option[String with A] // ¯\_(ツ)_/¯
 
   type FooBarBazKL = FooK ::: BarK ::: BazK ::: TNilK

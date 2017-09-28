@@ -1,4 +1,5 @@
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package test
 
 import scala.language.dynamics
@@ -28,17 +29,21 @@ final class MacrosLiterally(val c: Context) {
   import c.universe.{ Literal => ASTLiteral, _ }
   import internal.decorators._
 
+  private[this] final val iotaPackage: Tree =
+    q"_root_.iota"  //#=cats
+    q"_root_.iotaz" //#=scalaz
+
   def literalIntSelectDynamic(selector: Tree): Tree = {
     val q"${value: String}" = selector
     val tpe = c.internal.constantType(Constant(value.toInt))
-    val tree = tq"_root_.iota.test.Literal { type T = $tpe }"
+    val tree = tq"$iotaPackage.test.Literal { type T = $tpe }"
     ASTLiteral(Constant(())).setType(c.typecheck(tree, mode = c.TYPEmode).tpe)
   }
 
   def literalStringSelectDynamic(selector: Tree): Tree = {
     val q"${value: String}" = selector
     val tpe = c.internal.constantType(Constant(value))
-    val tree = tq"_root_.iota.test.Literal { type T = $tpe }"
+    val tree = tq"$iotaPackage.test.Literal { type T = $tpe }"
     ASTLiteral(Constant(())).setType(c.typecheck(tree, mode = c.TYPEmode).tpe)
   }
 }
