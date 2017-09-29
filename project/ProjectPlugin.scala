@@ -20,9 +20,15 @@ object ProjectPlugin extends AutoPlugin {
 
   object autoImport {
 
-    def module(modName: String, hideFolder: Boolean = false): CrossProject =
-      CrossProject(modName, file(s"""modules/${if (hideFolder) "." else ""}$modName"""), CrossType.Pure)
-        .settings(moduleName := s"iota-$modName")
+    def module(
+      modName: String, hideFolder: Boolean = false, prefixSuffix: String = ""
+    ): CrossProject =
+      CrossProject(
+        s"$modName$prefixSuffix",
+        file(s"""modules/${if (hideFolder) "." else ""}$modName$prefixSuffix"""),
+        CrossType.Pure
+      )
+        .settings(moduleName := s"iota${prefixSuffix}-$modName")
 
     def jvmModule(modName: String): Project =
       Project(modName, file(s"""modules/$modName"""))

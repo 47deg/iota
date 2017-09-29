@@ -19,7 +19,7 @@ lazy val core = module("core", hideFolder = true)
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 
-lazy val corez = module("corez", hideFolder = true)
+lazy val corez = module("core", hideFolder = true, prefixSuffix = "z")
   .settings(macroSettings)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     flags    = "scalaz" :: Nil,
@@ -48,7 +48,7 @@ lazy val tests = module("tests", hideFolder = true)
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
 
-lazy val testsz = module("testsz", hideFolder = true)
+lazy val testsz = module("tests", hideFolder = true, prefixSuffix = "z")
   .dependsOn(corez)
   .settings(noPublishSettings)
   .settings(macroSettings)

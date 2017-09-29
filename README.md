@@ -38,7 +38,7 @@ constant time access of the values. This syntax scales cleanly to
 support any number of disjunct types.
 
 ```scala
-import iota._
+import iota._ // or iotaz._
 import TList.::
 import TListK.:::
 
@@ -80,6 +80,10 @@ Cats friendly terminology (such as "FunctionK") is used in the iota
 modules while Scalaz friendly terminology (such as
 "NaturalTransformation") is used in the iotaz modules. If you find an
 issue or inconsistency, please file a GitHub issue and it will be fixed.
+
+The Cats examples will work against Scalaz, and vise versa, so long as the
+library specific terminology is adjusted. Expect more Scalaz examples as the
+Iota library evolves.
 
 ## Injection type classes
 
