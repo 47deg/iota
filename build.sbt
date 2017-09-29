@@ -21,7 +21,6 @@ lazy val coreJS  = core.js
 
 lazy val corez = module("corez", hideFolder = true)
   .settings(macroSettings)
-  .settings(noPublishSettings)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     flags    = "scalaz" :: Nil,
     yaxScala = true))
@@ -77,6 +76,7 @@ lazy val examplesJS  = examples.js
 
 lazy val readme = jvmModule("readme")
   .dependsOn(coreJVM)
+  .dependsOn(corezJVM)
   .enablePlugins(TutPlugin)
   .settings(noPublishSettings)
   .settings(readmeSettings)
