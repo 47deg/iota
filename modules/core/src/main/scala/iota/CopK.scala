@@ -17,7 +17,8 @@
 package iota  //#=cats
 package iotaz //#=scalaz
 
-import cats.~>
+import cats.~>   //#=cats
+import scalaz.~> //#=scalaz
 
 /** A coproduct of type constructors captured by type constructor list `L` */
 final class CopK[LL <: TListK, A] private(
@@ -28,7 +29,7 @@ final class CopK[LL <: TListK, A] private(
 
   override def equals(anyOther: Any): Boolean = anyOther match {
     case other: CopK[LL, A] => (index == other.index) && (value == other.value)
-    case _                => false
+    case _                  => false
   }
 
   override def toString: String =
@@ -43,7 +44,14 @@ object CopK {
   /** A type class witnessing the ability to inject type constructor `F`
     * into a coproduct of type constructors `G`
     */
-  sealed abstract class Inject[F[_], G[_] <: CopK[_, _]] extends cats.InjectK[F, G]
+  sealed abstract class Inject[F[_], G[_] <: CopK[_, _]]
+      extends cats.InjectK[F, G] //#=cats
+  {
+    //#+scalaz
+    def inj: F ~> G
+    def prj: G ~> λ[α => Option[F[α]]]
+    //#-scalaz
+  }
 
   object Inject {
     def apply[F[_], G[_] <: CopK[_, _]](implicit ev: Inject[F, G]): Inject[F, G] = ev
@@ -88,5 +96,7 @@ object CopK {
       new RemoveL[F, L](ev.index)
   }
 
-  val FunctionK: CopKFunctionK.type = CopKFunctionK
+  val FunctionK: CopKFunctionK.type = CopKFunctionK           //#=cats
+  val NaturalTransformation: CopKNaturalTransformation.type = //#=scalaz
+    CopKNaturalTransformation                                 //#=scalaz
 }

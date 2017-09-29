@@ -1,3 +1,4 @@
+
 # Iota
 
 ## Introduction
@@ -11,14 +12,18 @@ traditional coproducts frequently becomes unwieldy as the number of
 disjunct types grows.
 
 ```tut:silent
-import cats.data._
-
 // a coproduct of types using scala.util.Either
 type EitherFoo = Either[Int, Either[String, Double]]
 
 // a coproduct of type constructors using cats.data.EitherK
+import cats.data.EitherK
 type EitherKBar0[A] = EitherK[List, Seq, A]
 type EitherKBar[A] = EitherK[Option, EitherKBar0, A]
+
+// a coproduct of type constructors using scalaz.Coproduct
+import scalaz.Coproduct
+type CoproductKBar0[A] = Coproduct[List, Seq, A]
+type CoproductKBar[A] = Coproduct[Option, CoproductKBar0, A]
 ```
 
 Iota coproducts are linked lists at the type level. At the value level,
@@ -27,7 +32,7 @@ constant time access of the values. This syntax scales cleanly to
 support any number of disjunct types.
 
 ```tut:silent
-import iota._
+import iota._ // or iotaz._
 import TList.::
 import TListK.:::
 
@@ -47,16 +52,32 @@ For Scala 2.11.x and 2.12.x:
 [comment]: # (Start Replace)
 
 ```scala
-libraryDependencies += "com.47deg" %% "iota-core" % "0.3.0"
+libraryDependencies += "io.frees" %% "iota-core"  % "0.3.0" // for cats
+libraryDependencies += "io.frees" %% "iotaz-core" % "0.3.0" // for scalaz
 ```
 
 Or, if using Scala.js (0.6.x):
 
 ```scala
-libraryDependencies += "com.47deg" %%% "iota-core" % "0.3.0"
+libraryDependencies += "io.frees" %%% "iota-core"  % "0.3.0" // for cats
+libraryDependencies += "io.frees" %%% "iotaz-core" % "0.3.0" // for scalaz
 ```
 
 [comment]: # (End Replace)
+
+## Cats vs Scalaz
+
+Iota requires either Cats or Scalaz. If you're using Scalaz, use the "iotaz"
+modules and import from the `iotaz` package (instead of `iota`).
+
+Cats friendly terminology (such as "FunctionK") is used in the iota
+modules while Scalaz friendly terminology (such as
+"NaturalTransformation") is used in the iotaz modules. If you find an
+issue or inconsistency, please file a GitHub issue and it will be fixed.
+
+The Cats examples will work against Scalaz, and vise versa, so long as the
+library specific terminology is adjusted. Expect more Scalaz examples as the
+Iota library evolves.
 
 ## Injection type classes
 

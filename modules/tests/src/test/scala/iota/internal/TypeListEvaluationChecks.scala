@@ -16,7 +16,8 @@
 
 //#+jvm
 
-package iota
+package iota  //#=cats
+package iotaz //#=scalaz
 package internal
 
 import scala.Predef.ArrowAssoc

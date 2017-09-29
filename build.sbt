@@ -4,6 +4,8 @@ lazy val root = (project in file("."))
   .aggregate(testsJVM, testsJS)
   .aggregate(examplesJVM, examplesJS)
   .aggregate(bench)
+  .aggregate(corezJVM, corezJS)
+  .aggregate(testszJVM, testszJS)
 
 lazy val core = module("core", hideFolder = true)
   .settings(macroSettings)
@@ -17,15 +19,13 @@ lazy val core = module("core", hideFolder = true)
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 
-lazy val corez = module("corez", hideFolder = true)
+lazy val corez = module("core", hideFolder = true, prefixSuffix = "z")
   .settings(macroSettings)
-  .settings(noPublishSettings)
   .settings(yax(file("modules/core/src/main/scala"), Compile,
     flags    = "scalaz" :: Nil,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core"),
-    %%("cats-free"))
+    "org.scalaz" %% "scalaz-core" % "7.2.15")
 
 lazy val corezJVM = corez.jvm
 lazy val corezJS  = corez.js
@@ -35,8 +35,10 @@ lazy val tests = module("tests", hideFolder = true)
   .settings(noPublishSettings)
   .settings(macroSettings)
   .settings(yax(file("modules/tests/src/main/scala"), Compile,
+    flags       = "cats" :: Nil,
     yaxPlatform = true))
   .settings(yax(file("modules/tests/src/test/scala"), Test,
+    flags       = "cats" :: Nil,
     yaxPlatform = true))
   .crossDepSettings(
     %%("scalacheck")      % "test",
@@ -45,6 +47,24 @@ lazy val tests = module("tests", hideFolder = true)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+
+lazy val testsz = module("tests", hideFolder = true, prefixSuffix = "z")
+  .dependsOn(corez)
+  .settings(noPublishSettings)
+  .settings(macroSettings)
+  .settings(yax(file("modules/tests/src/main/scala"), Compile,
+    flags       = "scalaz" :: Nil,
+    yaxPlatform = true))
+  .settings(yax(file("modules/tests/src/test/scala"), Test,
+    flags       = "scalaz" :: Nil,
+    yaxPlatform = true))
+  .crossDepSettings(
+    %%("scalacheck")      % "test",
+    %%("shapeless")       % "test",
+    %%("scheckShapeless") % "test")
+
+lazy val testszJVM = testsz.jvm
+lazy val testszJS  = testsz.js
 
 lazy val examples = module("examples")
   .dependsOn(core)
@@ -56,6 +76,7 @@ lazy val examplesJS  = examples.js
 
 lazy val readme = jvmModule("readme")
   .dependsOn(coreJVM)
+  .dependsOn(corezJVM)
   .enablePlugins(TutPlugin)
   .settings(noPublishSettings)
   .settings(readmeSettings)

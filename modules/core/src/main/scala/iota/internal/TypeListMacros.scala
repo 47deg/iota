@@ -41,7 +41,7 @@ final class TypeListMacros(val c: Context) {
       index    <- Right(algebras.indexWhere(_ =:= A))
                     .filterOrElse(_ >= 0, s"$A is not a member of $L")
     } yield
-      q"new _root_.iota.TList.Pos[$L, $A]{ override val index: Int = $index }", true)
+      q"new ${tb.iotaPackage}.TList.Pos[$L, $A]{ override val index: Int = $index }", true)
   }
 
   def materializeTListKPos[L <: TListK, F[_]](
@@ -58,7 +58,7 @@ final class TypeListMacros(val c: Context) {
       index    <- Right(algebras.indexWhere(_ =:= F))
                     .filterOrElse(_ >= 0, s"$F is not a member of $L")
     } yield
-      q"new _root_.iota.TListK.Pos[$L, $F]{ override val index: Int = $index }", true)
+      q"new ${tb.iotaPackage}.TListK.Pos[$L, $F]{ override val index: Int = $index }", true)
   }
 
   def materializeTListCompute[L <: TList, O <: TList](
@@ -72,7 +72,7 @@ final class TypeListMacros(val c: Context) {
       algebras <- tb.memoizedTListTypes(L)
       tpe       = tb.buildTList(algebras)
     } yield
-      q"new _root_.iota.TList.Compute[$L]{ override type Out = $tpe }", true)
+      q"new ${tb.iotaPackage}.TList.Compute[$L]{ override type Out = $tpe }", true)
   }
 
   def materializeTListKCompute[L <: TListK, O <: TListK](
@@ -86,7 +86,7 @@ final class TypeListMacros(val c: Context) {
       algebras <- tb.memoizedTListKTypes(L)
       tpe       = tb.buildTListK(algebras)
     } yield
-      q"new _root_.iota.TListK.Compute[$L]{ override type Out = $tpe }", true)
+      q"new ${tb.iotaPackage}.TListK.Compute[$L]{ override type Out = $tpe }", true)
   }
 
 }

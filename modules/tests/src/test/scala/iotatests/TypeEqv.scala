@@ -1,6 +1,7 @@
 package iotatests
 
-import cats._
+import cats._   //#=cats
+import scalaz._ //#=scalaz
 import org.scalacheck.Prop
 import org.scalacheck.Prop._
 import shapeless.{ Id => _, _ }

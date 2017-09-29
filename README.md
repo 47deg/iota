@@ -16,14 +16,18 @@ traditional coproducts frequently becomes unwieldy as the number of
 disjunct types grows.
 
 ```scala
-import cats.data._
-
 // a coproduct of types using scala.util.Either
 type EitherFoo = Either[Int, Either[String, Double]]
 
 // a coproduct of type constructors using cats.data.EitherK
+import cats.data.EitherK
 type EitherKBar0[A] = EitherK[List, Seq, A]
 type EitherKBar[A] = EitherK[Option, EitherKBar0, A]
+
+// a coproduct of type constructors using scalaz.Coproduct
+import scalaz.Coproduct
+type CoproductKBar0[A] = Coproduct[List, Seq, A]
+type CoproductKBar[A] = Coproduct[Option, CoproductKBar0, A]
 ```
 
 Iota coproducts are linked lists at the type level. At the value level,
@@ -32,7 +36,7 @@ constant time access of the values. This syntax scales cleanly to
 support any number of disjunct types.
 
 ```scala
-import iota._
+import iota._ // or iotaz._
 import TList.::
 import TListK.:::
 
@@ -52,16 +56,32 @@ For Scala 2.11.x and 2.12.x:
 [comment]: # (Start Replace)
 
 ```scala
-libraryDependencies += "com.47deg" %% "iota-core" % "0.3.0"
+libraryDependencies += "io.frees" %% "iota-core"  % "0.3.0" // for cats
+libraryDependencies += "io.frees" %% "iotaz-core" % "0.3.0" // for scalaz
 ```
 
 Or, if using Scala.js (0.6.x):
 
 ```scala
-libraryDependencies += "com.47deg" %%% "iota-core" % "0.3.0"
+libraryDependencies += "io.frees" %%% "iota-core"  % "0.3.0" // for cats
+libraryDependencies += "io.frees" %%% "iotaz-core" % "0.3.0" // for scalaz
 ```
 
 [comment]: # (End Replace)
+
+## Cats vs Scalaz
+
+Iota requires either Cats or Scalaz. If you're using Scalaz, use the "iotaz"
+modules and import from the `iotaz` package (instead of `iota`).
+
+Cats friendly terminology (such as "FunctionK") is used in the iota
+modules while Scalaz friendly terminology (such as
+"NaturalTransformation") is used in the iotaz modules. If you find an
+issue or inconsistency, please file a GitHub issue and it will be fixed.
+
+The Cats examples will work against Scalaz, and vise versa, so long as the
+library specific terminology is adjusted. Expect more Scalaz examples as the
+Iota library evolves.
 
 ## Injection type classes
 
@@ -87,13 +107,13 @@ val foo2: Foo = DoubleFoo.inj(47.6062)
 ```
 ```scala
 processFoo(foo0)
-// res10: String = int: 100
+// res11: String = int: 100
 
 processFoo(foo1)
-// res11: String = string: hello world
+// res12: String = string: hello world
 
 processFoo(foo2)
-// res12: String = double: 47.6062
+// res13: String = double: 47.6062
 ```
 
 *coproduct of type constructors*
@@ -115,13 +135,13 @@ val bar2: Bar[String] = SeqBar.inj(Seq("a", "b", "c"))
 ```
 ```scala
 processBar(bar0)
-// res15: String = option: Some(200)
+// res16: String = option: Some(200)
 
 processBar(bar1)
-// res16: String = list: List(hello, world)
+// res17: String = list: List(hello, world)
 
 processBar(bar2)
-// res17: String = seq: List(a, b, c)
+// res18: String = seq: List(a, b, c)
 ```
 
 ## Fast Interpreters
@@ -182,7 +202,7 @@ import iota.debug.options.ShowTrees
 // import iota.debug.options.ShowTrees
 
 CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
-// <console>:33: {
+// <console>:32: {
 //   class CopKFunctionK$macro$4 extends _root_.iota.internal.FastFunctionK[Algebra, Future] {
 //     private[this] val arr0 = evalUserOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
 //     private[this] val arr1 = evalOrderOp.asInstanceOf[_root_.cats.arrow.FunctionK[Any, scala.concurrent.Future]];
@@ -191,8 +211,8 @@ CopK.FunctionK.of[Algebra, Future](evalOrderOp, evalPriceOp, evalUserOp)
 //       case 0 => arr0(η$.value)
 //       case 1 => arr1(η$.value)
 //       case 2 => arr2(η$.value)
-//       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds for ").+(this)...
-// res32: iota.internal.FastFunctionK[Algebra,scala.concurrent.Future] = FastFunctionK[Algebra, scala.concurrent.Future]<<generated>>
+//       case (i @ _) => throw new _root_.java.lang.Exception(StringContext("iota internal error: index ").s().+(i).+(" out of bounds for ")...
+// res33: iota.internal.FastFunctionK[Algebra,scala.concurrent.Future] = FastFunctionK[Algebra, scala.concurrent.Future]<<generated>>
 ```
 
 #### Is it actually faster?

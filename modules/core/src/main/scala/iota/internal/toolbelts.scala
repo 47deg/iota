@@ -18,16 +18,26 @@ package iota  //#=cats
 package iotaz //#=scalaz
 package internal
 
+//#+cats
 import cats.Applicative
 import cats.Id
 import cats.Eval
-import cats.FlatMap
 import cats.Foldable
 import cats.Traverse
 import cats.instances.either._
 import cats.instances.list._
-import cats.syntax.either._ //#=2.12
 import cats.syntax.foldable._
+//#-cats
+
+//#+scalaz
+import scalaz.Applicative
+import scalaz.Id.Id
+import scalaz.Foldable
+import scalaz.Traverse
+import scalaz.std.either._
+import scalaz.std.list._
+import scalaz.syntax.foldable._
+//#-scalaz
 
 import catryoshka._
 
@@ -48,6 +58,12 @@ private[internal] trait MacroToolbelt extends Toolbelt {
 
   final override type Uu = c.universe.type
   final override val u: Uu = c.universe
+
+  import u._
+
+  final val iotaPackage: Tree =
+    q"_root_.iota"  //#=cats
+    q"_root_.iotaz" //#=scalaz
 }
 
 object IotaReflectiveToolbelt {
@@ -107,7 +123,14 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
 
   object NodeF {
     implicit val nodeTraverse: Traverse[NodeF] = new Traverse[NodeF] {
-      def traverse[G[_], A, B](fa: NodeF[A])(f: A => G[B])(implicit G: Applicative[G]): G[NodeF[B]] = fa match {
+
+      //#+cats
+      def traverse[G[_]: Applicative, A, B](fa: NodeF[A])(f: A => G[B]): G[NodeF[B]] =
+        traverseImpl[G, A, B](fa)(f)
+      //#-cats
+
+      @inline private[this] //#=cats
+      def traverseImpl[G[_], A, B](fa: NodeF[A])(f: A => G[B])(implicit G: Applicative[G]): G[NodeF[B]] = fa match {
         case ConsF(hd, a)  => G.map(f(a))(ConsF(hd, _))
         case ConcatF(as)   => G.map(Traverse[List].traverse(as)(f))(ConcatF(_))
         case ReverseF(a)   => G.map(f(a))(ReverseF(_))
@@ -117,6 +140,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
         case NNilF         => G.pure(NNilF: NodeF[B])
       }
 
+      //#+cats
       def foldLeft[A, B](fa: NodeF[A], b: B)(f: (B, A) => B): B = fa match {
         case ConsF(_, a)   => f(b, a)
         case ConcatF(as)   => Foldable[List].foldLeft(as, b)(f)
@@ -136,6 +160,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
         case RemoveF(_, a) => f(a, lb)
         case NNilF         => lb
       }
+      //#-cats
     }
   }
 }
@@ -206,7 +231,7 @@ private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeList
 
   final def evalTree: TypeListEvaluator = {
     case ConsF(head, types) => head :: types
-    case ConcatF(typeLists) => FlatMap[List].flatten(typeLists)
+    case ConcatF(typeLists) => typeLists.flatMap(l => l)
     case ReverseF(types)    => types.reverse
     case TakeF(n, types)    => types.take(n)
     case DropF(n, types)    => types.drop(n)
@@ -330,6 +355,10 @@ private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
     case _                    => c.internal.gen.mkAttributedIdent(tpe.typeSymbol)
   }
 
+  private[this] val FastNatTrans =
+    tq"$iotaPackage.internal.FastFunctionK" //#=cats
+    tq"$iotaPackage.internal.FastNaturalTransformation" //#=scalaz
+
   final def defineFastFunctionK(
     className: TypeName,
     F: Type, G: Type,
@@ -350,7 +379,7 @@ private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
     val toStringValue = s"FastFunctionK[$F, $G]<<generated>>"
 
     q"""
-    class $className extends _root_.iota.internal.FastFunctionK[$FF, $GG] {
+    class $className extends $FastNatTrans[$FF, $GG] {
       ..$preamble
       override def apply[$A]($fa: $FA): $GA =
         (${toIndex(fa)}: @_root_.scala.annotation.switch) match {

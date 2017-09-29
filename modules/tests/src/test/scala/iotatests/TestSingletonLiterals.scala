@@ -1,7 +1,10 @@
 package iotatests
 
-import iota.test.LiteralInt
-import iota.test.LiteralString
+import iota._  //#=cats
+import iotaz._ //#=scalaz
+
+import test.LiteralInt
+import test.LiteralString
 
 object TestSingletonLiterals {
 

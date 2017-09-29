@@ -41,7 +41,8 @@ object Cop {
   /** A type class witnessing the ability to inject type `A` into a
     * coproduct of types `B`
     */
-  sealed abstract class Inject[A, B <: Cop[_]] extends cats.Inject[A, B]
+  sealed abstract class Inject[A, B <: Cop[_]]
+      extends cats.Inject[A, B] //#=cats
 
   object Inject {
     def apply[A, B <: Cop[_]](implicit ev: Inject[A, B]): Inject[A, B] = ev

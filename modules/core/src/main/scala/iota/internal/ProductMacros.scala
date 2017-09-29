@@ -20,10 +20,18 @@ package internal
 
 import scala.reflect.macros.blackbox.Context
 
+//#+cats
 import cats.Traverse
 import cats.data.NonEmptyList
 import cats.instances.list._
 import cats.syntax.either._ //#=2.12
+//#-cats
+
+//#+scalaz
+import scalaz.Traverse
+import scalaz.NonEmptyList
+import scalaz.std.list._
+//#-scalaz
 
 private[iota]  //#=cats
 private[iotaz] //#=scalaz
@@ -46,9 +54,9 @@ final class ProductMacros(val c: Context) {
                     s"Expected ${algebras.length} arguments but received ${argTypes.length}")
       _        <- Traverse[List].traverse(argTypes zip algebras)(tpes =>
                     require(tpes._1 <:< tpes._2,
-                      s"Expected ${tpes._1} <:< ${tpes._2}").toValidated).toEither
+                      s"Expected ${tpes._1} <:< ${tpes._2}").toAvowal).toEither
     } yield
-      q"_root_.iota.Prod.unsafeApply[$L](_root_.scala.collection.immutable.IndexedSeq[_root_.scala.Any](..$args))")
+      q"${tb.iotaPackage}.Prod.unsafeApply[$L](_root_.scala.collection.immutable.IndexedSeq[_root_.scala.Any](..$args))")
   }
 
   private[this] def require(flag: Boolean, msg: => String): Either[NonEmptyList[String], Unit] =

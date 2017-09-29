@@ -16,13 +16,16 @@
 
 package iotatests
 
-import cats._
-import cats.free._
+import cats._       //#=cats
+import cats.free._  //#=cats
+import scalaz._     //#=scalaz
+import scalaz.Id.Id //#=scalaz
 
 import org.scalacheck._
 import org.scalacheck.Prop._
 
-import iota._
+import iota._  //#=cats
+import iotaz._ //#=scalaz
 
 object MathAlgebraKs {
   sealed abstract class AddOne[A]
@@ -71,12 +74,12 @@ object FreeCopK extends Properties("FreeCopK") {
       `-202` <- liftFree[Algebra](XTwo.Value(`-101`))
     } yield `-101` + `-202`
 
-  lazy val evalSummon = CopK.FunctionK.summon[Algebra, Id]
+  lazy val evalSummon = CopKNT.summon[Algebra, Id]
 
   property("basic math program through summoned interpreter") =
     program.foldMap(evalSummon) ?= -303
 
-  lazy val evalOf     = CopK.FunctionK.of[Algebra, Id](
+  lazy val evalOf     = CopKNT.of[Algebra, Id](
     evalAddOne, evalXTwo, evalHalf, evalNeg)
 
   property("basic math program regular interpreter") =
@@ -88,9 +91,9 @@ object FreeCopK extends Properties("FreeCopK") {
   }
 
   // must compile
-  val evalSummonModule = CopK.FunctionK.summon[Module.Op, Id]
+  val evalSummonModule = CopKNT.summon[Module.Op, Id]
 
   // must compile
-  val evalOfModule     = CopK.FunctionK.of[Module.Op, Id](
+  val evalOfModule     = CopKNT.of[Module.Op, Id](
     evalAddOne, evalXTwo, evalHalf, evalNeg)
 }

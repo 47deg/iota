@@ -16,7 +16,8 @@
 
 package iotatests
 
-import iota._
+import iota._  //#=cats
+import iotaz._ //#=scalaz
 
 object TListChecks {
   import TestSingletonLiterals._
