@@ -148,12 +148,24 @@ private[internal] object catryoshka {
       }
   }
 
-  final case class Fix[F[_]](unFix: F[Fix[F]])
+  sealed trait FixDecl {
+    type Fix[F[_]]
 
-  object Fix {
-    implicit def fixBirecursive[F[_]]: Birecursive.Aux[Fix[F], F] =
-      Birecursive.algebraIso(Fix(_), _.unFix)
+    @inline final def apply[F[_]](f: F[Fix.Fix[F]]): Fix[F] = fix(f)
+
+    @inline def fix[F[_]](f: F[Fix.Fix[F]]): Fix[F]
+    @inline def unfix[F[_]](f: Fix[F]): F[Fix.Fix[F]]
   }
+
+  type Fix[F[_]] = Fix.Fix[F]
+  val Fix: FixDecl = new FixDecl {
+    type Fix[F[_]] = F[Fix.Fix[F]]
+    def fix[F[_]](f: F[Fix.Fix[F]]): Fix[F] = f
+    def unfix[F[_]](f: Fix[F]): F[Fix.Fix[F]] = f
+  }
+
+  implicit def fixBirecursive[F[_]]: Birecursive.Aux[Fix[F], F] =
+    Birecursive.algebraIso(Fix.fix, Fix.unfix)
 
   case class EnvT[B, W[_], A](ask: B, lower: W[A])
   object EnvT {
