@@ -43,6 +43,12 @@ object Cop {
     */
   sealed abstract class Inject[A, B <: Cop[_]]
       extends cats.Inject[A, B] //#=cats
+  {
+    //#+scalaz
+    def inj: A => B
+    def prj: B => Option[A]
+    //#-scalaz
+  }
 
   object Inject {
     def apply[A, B <: Cop[_]](implicit ev: Inject[A, B]): Inject[A, B] = ev
