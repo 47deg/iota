@@ -47,6 +47,8 @@ object TList {
     type Take   [N <: SingletonInt, L <: TList] <: TList
     type Drop   [N <: SingletonInt, L <: TList] <: TList
     type Remove [T, L <: TList]                 <: TList
+
+    type Map    [F[_], L <: TList]              <: TList
   }
 
   trait Compute[L <: TList] {

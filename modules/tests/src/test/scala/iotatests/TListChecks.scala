@@ -54,4 +54,14 @@ object TListChecks {
   check[Remove[Int, StringIntL], String :: TNil]
   check[Remove[Int, Int :: Int :: TNil], Int :: TNil]
 
+  check[Map[Option, Int :: TNil], Option[Int] :: TNil]
+  check[Map[List, String :: Double :: TNil], List[String] :: List[Double] :: TNil]
+
+  check[
+    Map[λ[a => Int], String :: Double :: Long :: TNil],
+    Int :: Int :: Int :: TNil]
+
+  check[
+    Map[λ[a => Either[a, a]], String :: Double :: Long :: TNil],
+    Either[String, String] :: Either[Double, Double] :: Either[Long, Long] :: TNil]
 }

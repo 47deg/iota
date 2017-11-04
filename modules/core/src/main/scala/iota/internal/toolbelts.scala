@@ -111,6 +111,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
   case class   TakeF   [A](n: Int, node: A)     extends NodeF[A]
   case class   DropF   [A](n: Int, node: A)     extends NodeF[A]
   case class   RemoveF [A](t: Type, nodes: A)   extends NodeF[A]
+  case class   MapF    [A](f: Type, nodes: A)   extends NodeF[A]
   case object  NNilF                            extends NodeF[Nothing]
 
   sealed trait ConsFEquality { self: ConsF[_] =>
@@ -137,6 +138,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
         case TakeF(n, a)   => G.map(f(a))(TakeF(n, _))
         case DropF(n, a)   => G.map(f(a))(DropF(n, _))
         case RemoveF(t, a) => G.map(f(a))(RemoveF(t, _))
+        case MapF(ft, a)   => G.map(f(a))(MapF(ft, _))
         case NNilF         => G.pure(NNilF: NodeF[B])
       }
 
@@ -148,6 +150,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
         case TakeF(_, a)   => f(b, a)
         case DropF(_, a)   => f(b, a)
         case RemoveF(_, a) => f(b, a)
+        case MapF(_, a)    => f(b, a)
         case NNilF         => b
       }
 
@@ -158,6 +161,7 @@ private[internal] sealed trait TypeListAST { self: Toolbelt =>
         case TakeF(_, a)   => f(a, lb)
         case DropF(_, a)   => f(a, lb)
         case RemoveF(_, a) => f(a, lb)
+        case MapF(_, a)    => f(a, lb)
         case NNilF         => lb
       }
       //#-cats
@@ -177,7 +181,8 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
     ReverseSym = symbolOf[TList.Op.Reverse[Nothing]],
     TakeSym    = symbolOf[TList.Op.Take[Nothing, Nothing]],
     DropSym    = symbolOf[TList.Op.Drop[Nothing, Nothing]],
-    RemoveSym  = symbolOf[TList.Op.Remove[Nothing, Nothing]])
+    RemoveSym  = symbolOf[TList.Op.Remove[Nothing, Nothing]],
+    MapSym     = symbolOf[TList.Op.Map[Nothing, Nothing]])
 
   final lazy val tlistkParser: TypeListParser = typeListParser(
     NilSym     = symbolOf[TNilK],
@@ -197,7 +202,8 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
     ReverseSym: Symbol,
     TakeSym   : Symbol,
     DropSym   : Symbol,
-    RemoveSym: Symbol
+    RemoveSym : Symbol,
+    MapSym    : Symbol = symbolOf[Disregard]
   ): TypeListParser = tpe0 => {
     @tailrec def loop(tpe: Type): Either[Id[String], NodeF[Type]] = tpe.dealias match {
       case TypeRef(_, sym, args) =>
@@ -209,6 +215,7 @@ private[internal] sealed trait TypeListParsers { self: Toolbelt with TypeListAST
           case TakeSym    => literalInt(args(0)).map(TakeF(_, args(1)))
           case DropSym    => literalInt(args(0)).map(DropF(_, args(1)))
           case RemoveSym  => RemoveF(args(0), args(1)).asRight
+          case MapSym     => MapF(args(0), args(1)).asRight
           case sym        => s"Unexpected symbol $sym for type $tpe: ${showRaw(tpe)}".asLeft
         }
       case ExistentialType(_, res) => loop(res) // the irony...
@@ -236,6 +243,7 @@ private[internal] sealed trait TypeListEvaluators { self: Toolbelt with TypeList
     case TakeF(n, types)    => types.take(n)
     case DropF(n, types)    => types.drop(n)
     case RemoveF(t, types)  => removeFirst(types)(_ =:= t)
+    case MapF(tf, types)    => types.map(t => appliedType(tf, t))
     case NNilF              => Nil
   }
 
