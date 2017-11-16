@@ -2,7 +2,8 @@ lazy val root = (project in file("."))
   .settings(noPublishSettings)
   .aggregate(coreJVM, coreJS)
   .aggregate(testsJVM, testsJS)
-  .aggregate(examplesJVM, examplesJS)
+  .aggregate(examplesCatsJVM, examplesCatsJS)
+  .aggregate(examplesScalazJVM, examplesScalazJS)
   .aggregate(bench)
   .aggregate(corezJVM, corezJS)
   .aggregate(testszJVM, testszJS)
@@ -66,13 +67,25 @@ lazy val testsz = module("tests", hideFolder = true, prefixSuffix = "z")
 lazy val testszJVM = testsz.jvm
 lazy val testszJS  = testsz.js
 
-lazy val examples = module("examples")
+lazy val examplesCats = module("examples-cats")
   .dependsOn(core)
   .settings(noPublishSettings)
   .settings(macroSettings)
 
-lazy val examplesJVM = examples.jvm
-lazy val examplesJS  = examples.js
+lazy val examplesCatsJVM = examplesCats.jvm
+lazy val examplesCatsJS  = examplesCats.js
+
+lazy val examplesScalaz = module("examples-scalaz")
+  .dependsOn(corez)
+  .settings(noPublishSettings)
+  .settings(macroSettings)
+  .crossDepSettings(
+    "org.scalaz" %% "scalaz-effect" % "7.2.15")
+
+lazy val examplesScalazJVM = examplesScalaz.jvm
+lazy val examplesScalazJS  = examplesScalaz.js
+
+
 
 lazy val readme = jvmModule("readme")
   .dependsOn(coreJVM)
