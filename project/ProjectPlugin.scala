@@ -70,7 +70,7 @@ object ProjectPlugin extends AutoPlugin {
     ),
     orgUpdateDocFilesSetting +=
       (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
-    orgEnforcedFilesSetting ~= (_ filterNot (_ == ScalafmtFileType)),
+    orgEnforcedFilesSetting := Nil,
 
     headerCreate in Compile := Nil,
     headerCreate in Test := Nil,
