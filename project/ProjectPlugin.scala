@@ -34,13 +34,6 @@ object ProjectPlugin extends AutoPlugin {
     def jvmModule(modName: String): Project =
       Project(modName, file(s"""modules/$modName"""))
         .settings(moduleName := s"iota-$modName")
-
-    lazy val readmeSettings: Seq[Def.Setting[_]] = Seq(
-      scalacOptions in Tut := Nil,
-      tutSourceDirectory :=
-        (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
-      tutTargetDirectory := baseDirectory.value.getParentFile.getParentFile
-    )
   }
 
   lazy val commandAliases: Seq[Def.Setting[_]] = addCommandAlias("tutReadme", ";project readme;tut;project root")

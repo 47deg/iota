@@ -40,6 +40,9 @@ final class CopKFunctionKMacros(val c: Context) {
     val G = evG.tpe
 
     tb.foldAbort(for {
+      _    <- guardAssumptions("F", F)
+      _    <- guardAssumptions("G", G)
+
       copK <- tb.destructCopK(F).leftMap(NonEmptyList.one(_))
       tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.one(_))
 
@@ -62,12 +65,25 @@ final class CopKFunctionKMacros(val c: Context) {
     val G = evG.tpe
 
     tb.foldAbort(for {
+      _    <- guardAssumptions("F", F)
+      _    <- guardAssumptions("G", G)
+
       copK <- tb.destructCopK(F).leftMap(NonEmptyList.one(_))
       tpes <- tb.memoizedTListKTypes(copK.L).leftMap(NonEmptyList.one(_))
 
       arrs <- Traverse[List].traverse(tpes)(tpe =>
                 summonFunctionK(tpe, G)).toEither
     } yield makeInterpreter(F, copK.L, G, arrs))
+  }
+
+  private[this] def guardAssumptions(
+    name: String, T: Type
+  ): Either[NonEmptyList[String], _] = T.resultType match {
+    case _: ExistentialType => Left(NonEmptyList.one(
+      s"type parameter $name was inferred to be existential type $T and must be specified"))
+    case _ if T =:= typeOf[Nothing] => Left(NonEmptyList.one(
+      s"type parameter $name was inferred to be Nothing and must be specified"))
+    case _ => Right(())
   }
 
   private[this] def makeInterpreter(

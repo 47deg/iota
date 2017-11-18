@@ -6,8 +6,6 @@ import scalaz._
 import scalaz.effect._
 import scalaz.syntax.apply._
 
-import scala.Predef._
-
 sealed trait TerminalOp[A]
 object TerminalOp {
   case object ReadLine extends TerminalOp[String]
@@ -43,11 +41,11 @@ object FreeExample extends SafeApp {
     }
 
   val stateToProgram = λ[State[Long, ?] ~> Program](_.mapT(v => IO(v)))
-  val ioToProgram    = λ[IO ~> Program](io => StateT(s => io.map(s -> _)))
-  val interpreter: Algebra ~> Program =
+  val ioToProgram    = λ[IO ~> Program](io => StateT(s => io.map((s, _))))
+  val interpreter: scalaz.NaturalTransformation[Algebra, Program] =
     CopK.NaturalTransformation.of[Algebra, Program](
-      counterToState andThen stateToProgram,
-      terminalToIO andThen ioToProgram)
+      terminalToIO andThen ioToProgram,
+      counterToState andThen stateToProgram)
 
   implicit class AlgebraSyntax[F[_], A](fa: F[A])(
     implicit ev: CopK.Inject[F, Algebra]

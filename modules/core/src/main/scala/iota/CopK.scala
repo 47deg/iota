@@ -34,6 +34,8 @@ object CopK {
     //#+scalaz
     def inj: F ~> G
     def prj: G ~> λ[α => Option[F[α]]]
+    final def apply[A](fa: F[A]): G[A] = inj(fa)
+    final def unapply[A](ga: G[A]): Option[F[A]] = prj(ga)
     //#-scalaz
   }
 

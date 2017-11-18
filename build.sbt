@@ -7,6 +7,7 @@ lazy val root = (project in file("."))
   .aggregate(bench)
   .aggregate(corezJVM, corezJS)
   .aggregate(testszJVM, testszJS)
+  .aggregate(readme, docs)
 
 lazy val core = module("core", hideFolder = true)
   .settings(macroSettings)
@@ -90,8 +91,22 @@ lazy val readme = jvmModule("readme")
   .dependsOn(corezJVM)
   .enablePlugins(TutPlugin)
   .settings(noPublishSettings)
-  .settings(readmeSettings)
   .settings(macroSettings)
+  .settings(
+    scalacOptions in Tut := Nil,
+    tutTargetDirectory := (baseDirectory in LocalRootProject).value)
+
+lazy val docs = jvmModule("docs")
+  .dependsOn(coreJVM)
+  .dependsOn(corezJVM)
+  .enablePlugins(TutPlugin)
+  .settings(noPublishSettings)
+  .settings(macroSettings)
+  .settings(
+    scalacOptions in Tut := Nil,
+    tutTargetDirectory := (baseDirectory in LocalRootProject).value / "docs")
+  .settings(libraryDependencies +=
+    "org.scalaz" %% "scalaz-effect" % "7.2.15")
 
 lazy val bench = jvmModule("bench")
   .enablePlugins(JmhPlugin)

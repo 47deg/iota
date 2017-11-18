@@ -31,6 +31,8 @@ object Cop {
     //#+scalaz
     def inj: A => B
     def prj: B => Option[A]
+    final def apply(a: A): B = inj(a)
+    final def unapply(b: B): Option[A] = prj(b)
     //#-scalaz
   }
 

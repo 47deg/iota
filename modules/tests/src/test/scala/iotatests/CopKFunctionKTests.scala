@@ -25,4 +25,9 @@ object CopKFunctionKTests {
     }
 
   CopKNT.summon[CopK[FooOp :: BarOp :: TNilK, ?], Either[String, ?]]
+
+  //#+cats
+  val res0: CopK[FooOp :: BarOp :: TNilK, ?] ~> Either[String, ?] =
+    CopKNT.summon
+  //#-cats
 }
