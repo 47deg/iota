@@ -398,10 +398,10 @@ private[internal] sealed trait TypeListMacroAPIs extends TypeListAPIs { self: Ma
     !c.inferImplicitValue(typeOf[debug.optionTypes.ShowTrees], true).isEmpty
 
   def foldAbort[F[_]: Foldable, T](
-    either: Either[F[String], Tree],
+    either: => Either[F[String], Tree],
     isImplicit: Boolean = false
   ): c.Expr[T] =
-    either fold (
+    try either.fold(
       errors => {
         val error = errors.toList.mkString(", and\n")
         if (isImplicit && showAborts) c.echo(c.enclosingPosition, error)
@@ -411,6 +411,12 @@ private[internal] sealed trait TypeListMacroAPIs extends TypeListAPIs { self: Ma
         if (showTrees) c.echo(c.enclosingPosition, showCode(tree))
         c.Expr[T](tree)
       })
+    catch {
+      case e: StackOverflowError =>
+        c.echo(c.enclosingPosition,
+          "iota has burst the stack! please report this error on GitHub")
+        throw e
+    }
 
   def memoize[A, B](cache: IotaMacroToolbelt.Cache)(
     a: A, f: A => B
