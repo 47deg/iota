@@ -86,6 +86,7 @@ object CopKTests extends Properties("CopKTests") {
       CopK.InjectL[Three, Reverse[ThreeTwoOneL]],
       2)
 
+  //#+cats
   type First[A] = String
   type Last[A] = A
   type Y[A]
@@ -126,4 +127,5 @@ object CopKTests extends Properties("CopKTests") {
       arbitrary[Last[Int]],
       CopK.InjectL[Last, Yuge],
       301)
+  //#-cats
 }

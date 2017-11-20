@@ -75,6 +75,7 @@ object CopTests extends Properties("CopTests") {
       Cop.InjectL[Three, Reverse[ThreeTwoOneL]],
       2)
 
+  //#+cats
   type First = Int
   type Last  = String
   type Y
@@ -98,9 +99,9 @@ object CopTests extends Properties("CopTests") {
     Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
     Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
     Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
-    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: //#=cats
-    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: //#=cats
-    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: //#=cats
+    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
+    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
+    Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y :: Y ::
     Last ::
     TNil
 
@@ -116,4 +117,5 @@ object CopTests extends Properties("CopTests") {
       arbitrary[Last],
       Cop.InjectL[Last, Yuge],
       301)
+  //#-cats
 }
