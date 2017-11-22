@@ -77,29 +77,7 @@ object ProjectPlugin extends AutoPlugin {
     cancelable in Global := true,
 
     crossScalaVersions :=  List("2.11.11", "2.12.3"),
-    scalaVersion       := "2.12.3",
-
-    scalacOptions ++= Seq(
-      "-Xfatal-warnings",
-      "-Ywarn-unused-import",
-      "-Yno-predef",
-      "-Ypartial-unification"),
-
-    scalacOptions := (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 12)) => scalacOptions.value
-      case _             => scalacOptions.value.filter(_ != "-Xfatal-warnings")
-    }),
-
-    scalacOptions in (Compile, doc) :=
-      (scalacOptions in (Compile, doc)).value.filter(_ != "-Xfatal-warnings"),
-
-    scalacOptions in (Compile, console) ~= (_.filterNot(Set(
-      "-Ywarn-unused:imports",
-      "-Ywarn-unused-import",
-      "-Xfatal-warnings"
-    ))),
-
-    scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
+    scalaVersion       := "2.12.3"
   )
 
 }
