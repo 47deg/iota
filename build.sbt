@@ -1,11 +1,13 @@
 lazy val root = (project in file("."))
   .settings(noPublishSettings)
   .aggregate(coreJVM, coreJS)
+  .aggregate(quasiJVM, quasiJS)
   .aggregate(testsJVM, testsJS)
   .aggregate(examplesCatsJVM, examplesCatsJS)
   .aggregate(examplesScalazJVM, examplesScalazJS)
   .aggregate(bench)
   .aggregate(corezJVM, corezJS)
+  .aggregate(quasizJVM, quasizJS)
   .aggregate(testszJVM, testszJS)
   .aggregate(readme, docs)
 
@@ -15,8 +17,8 @@ lazy val core = module("core", hideFolder = true)
     flags    = "cats" :: Nil,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core"),
-    %%("cats-free"))
+    "org.typelevel" %% "cats-core" % "1.0.0-RC1",
+    "org.typelevel" %% "cats-free" % "1.0.0-RC1")
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
@@ -31,6 +33,26 @@ lazy val corez = module("core", hideFolder = true, prefixSuffix = "z")
 
 lazy val corezJVM = corez.jvm
 lazy val corezJS  = corez.js
+
+lazy val quasi = module("quasi", hideFolder = true)
+  .dependsOn(core)
+  .settings(macroSettings)
+  .settings(yax(file("modules/quasi/src/main/scala"), Compile,
+    flags    = "cats" :: Nil,
+    yaxScala = true))
+
+lazy val quasiJVM = quasi.jvm
+lazy val quasiJS  = quasi.js
+
+lazy val quasiz = module("quasi", hideFolder = true, prefixSuffix = "z")
+  .dependsOn(corez)
+  .settings(macroSettings)
+  .settings(yax(file("modules/quasi/src/main/scala"), Compile,
+    flags    = "scalaz" :: Nil,
+    yaxScala = true))
+
+lazy val quasizJVM = quasiz.jvm
+lazy val quasizJS  = quasiz.js
 
 lazy val tests = module("tests", hideFolder = true)
   .dependsOn(core)
