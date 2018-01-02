@@ -15,8 +15,8 @@ lazy val core = module("core", hideFolder = true)
     flags    = "cats" :: Nil,
     yaxScala = true))
   .crossDepSettings(
-    %%("cats-core", "1.0.0"),
-    %%("cats-free", "1.0.0"))
+    %%("cats-core", "1.0.1"),
+    %%("cats-free", "1.0.1"))
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
