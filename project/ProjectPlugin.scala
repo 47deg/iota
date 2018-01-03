@@ -7,6 +7,7 @@ import sbtorgpolicies.OrgPoliciesPlugin.autoImport._
 import sbtorgpolicies.templates.badges._
 import sbtorgpolicies.templates._
 import sbtorgpolicies.runnable.syntax._
+import dependencies.DependenciesPlugin.autoImport._
 import scoverage.ScoverageKeys._
 import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
@@ -65,6 +66,12 @@ object ProjectPlugin extends AutoPlugin {
       (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
     orgEnforcedFilesSetting := Nil,
 
+    orgAfterCISuccessTaskListSetting := List(
+      depUpdateDependencyIssues.asRunnableItem,
+      orgPublishReleaseTask.asRunnableItem(allModules = true, aggregated = false, crossScalaVersions = true),
+      orgUpdateDocFiles.asRunnableItem
+    ),
+
     headerCreate in Compile := Nil,
     headerCreate in Test := Nil,
     orgMaintainersSetting += Dev("andyscott", Some("Andy Scott (twitter: [@andygscott](https://twitter.com/andygscott))"), Some("andy.g.scott@gmail.com")),
@@ -76,8 +83,8 @@ object ProjectPlugin extends AutoPlugin {
     connectInput in run := true,
     cancelable in Global := true,
 
-    crossScalaVersions :=  List("2.11.11", "2.12.3"),
-    scalaVersion       := "2.12.3"
+    crossScalaVersions :=  List("2.11.12", "2.12.4"),
+    scalaVersion       := "2.12.4"
   )
 
 }
