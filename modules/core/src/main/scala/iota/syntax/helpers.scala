@@ -2,6 +2,14 @@ package iota  //#=cats
 package iotaz //#=scalaz
 package syntax
 
+import iota.evidence._  //#=cats
+import iotaz.evidence._ //#=scalaz
+
+trait EvidenceSyntax {
+  def firstK[L <: TListK, A](implicit ev: FirstK[L, A]): CopK[L, A] =
+    ev.underlying
+}
+
 final class InjectOps[A](val a: A) extends AnyVal {
   def inject[B <: Cop[_]](implicit ev: Cop.Inject[A, B]): B =
     ev.inj(a)
