@@ -16,7 +16,7 @@ import scalaz._
 import Scalaz._
 //#-scalaz
 
-import scala.reflect.macros.whitebox.Context
+import scala.reflect.macros.blackbox.Context
 import scala.reflect.macros.TypecheckException
 
 final class EvidenceMacros(val c: Context) {
