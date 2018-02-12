@@ -64,7 +64,26 @@ object ProjectPlugin extends AutoPlugin {
     ),
     orgUpdateDocFilesSetting +=
       (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
-    orgEnforcedFilesSetting := Nil,
+    orgEnforcedFilesSetting := List(
+      LicenseFileType(orgGithubSetting.value, orgLicenseSetting.value, startYear.value),
+      ContributingFileType(orgProjectName.value, orgGithubSetting.value),
+      VersionSbtFileType,
+      ChangelogFileType,
+      ReadmeFileType(
+        orgProjectName.value,
+        orgGithubSetting.value,
+        startYear.value,
+        orgLicenseSetting.value,
+        orgCommitBranchSetting.value,
+        sbtPlugin.value,
+        name.value,
+        version.value,
+        scalaBinaryVersion.value,
+        sbtBinaryVersion.value,
+        orgSupportedScalaJSVersion.value,
+        orgBadgeListSetting.value
+      )
+    ),
 
     orgAfterCISuccessTaskListSetting := List(
       depUpdateDependencyIssues.asRunnableItem,

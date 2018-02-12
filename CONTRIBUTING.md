@@ -1,7 +1,7 @@
 # Contributing
 
-Discussion around Iota happens in the [Gitter channel](https://gitter.im/47deg/freestyle) as well as on
-[GitHub issues](https://github.com/47deg/freestyle/issues) and [pull requests](https://github.com/47deg/freestyle/pulls).
+Discussion around Iota happens in the [Gitter channel](https://gitter.im/frees-io/iota) as well as on
+[GitHub issues](https://github.com/frees-io/iota/issues) and [pull requests](https://github.com/frees-io/iota/pulls).
 
 Feel free to open an issue if you notice a bug, have an idea for a feature, or have a question about
 the code. Pull requests are also welcome.
