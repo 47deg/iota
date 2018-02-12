@@ -55,13 +55,6 @@ object ProjectPlugin extends AutoPlugin {
       GitHubIssuesBadge.apply(_)
     ),
 
-    orgScriptTaskListSetting := List(
-      orgValidateFiles.asRunnableItem,
-      "clean".asRunnableItemFull,
-      "compile".asRunnableItemFull,
-      "test".asRunnableItemFull,
-      "tutReadme".asRunnableItem
-    ),
     orgUpdateDocFilesSetting +=
       (baseDirectory in LocalRootProject).value / "modules" / "readme" / "src" / "main" / "tut",
     orgEnforcedFilesSetting := List(
@@ -83,12 +76,6 @@ object ProjectPlugin extends AutoPlugin {
         orgSupportedScalaJSVersion.value,
         orgBadgeListSetting.value
       )
-    ),
-
-    orgAfterCISuccessTaskListSetting := List(
-      depUpdateDependencyIssues.asRunnableItem,
-      orgPublishReleaseTask.asRunnableItem(allModules = true, aggregated = false, crossScalaVersions = true),
-      orgUpdateDocFiles.asRunnableItem
     ),
 
     headerCreate in Compile := Nil,

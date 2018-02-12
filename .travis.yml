@@ -13,14 +13,40 @@ before_install:
   fi
 
 script:
-- sbt ++$TRAVIS_SCALA_VERSION orgScriptCI
+- sbt ++$TRAVIS_SCALA_VERSION clean compile test
 
-after_success:
-- sbt ++$TRAVIS_SCALA_VERSION orgAfterCISuccess
+stages:
+  - test
+  - validate
+  - deploy
+
+jobs:
+  include:
+    - stage: validate
+      script:
+        - sbt ++$TRAVIS_SCALA_VERSION orgValidateFiles
+        - sbt ++$TRAVIS_SCALA_VERSION tutReadme
+      scala: 2.12.4
+    - stage: deploy
+      script:
+        - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+            if grep -q "SNAPSHOT" version.sbt; then
+              sbt ++$TRAVIS_SCALA_VERSION publish;
+            else
+              sbt orgUpdateDocFiles;
+              git reset --hard HEAD;
+              git clean -f;
+              git checkout master;
+              git pull origin master;
+              sbt release;
+              sbt depUpdateDependencyIssues;
+            fi
+          fi
+      scala: 2.12.4
 
 cache:
   directories:
-  - $HOME/.sbt/0.13
+  - $HOME/.sbt/1.0
   - $HOME/.sbt/boot/scala*
   - $HOME/.sbt/cache
   - $HOME/.sbt/launchers
