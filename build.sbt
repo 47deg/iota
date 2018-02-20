@@ -29,7 +29,7 @@ lazy val corez = module("core", hideFolder = true, prefixSuffix = "z")
     flags    = "scalaz" :: Nil,
     yaxScala = true))
   .crossDepSettings(
-    "org.scalaz" %% "scalaz-core" % "7.2.15")
+    "org.scalaz" %% "scalaz-core" % "7.2.19")
 
 lazy val corezJVM = corez.jvm
 lazy val corezJS  = corez.js
@@ -109,7 +109,7 @@ lazy val examplesScalaz = module("examples-scalaz")
   .settings(noPublishSettings)
   .settings(macroSettings)
   .crossDepSettings(
-    "org.scalaz" %% "scalaz-effect" % "7.2.15")
+    "org.scalaz" %% "scalaz-effect" % "7.2.19")
 
 lazy val examplesScalazJVM = examplesScalaz.jvm
 lazy val examplesScalazJS  = examplesScalaz.js
@@ -134,7 +134,7 @@ lazy val docs = jvmModule("docs")
     scalacOptions in Tut := Nil,
     tutTargetDirectory := (baseDirectory in LocalRootProject).value / "docs")
   .settings(libraryDependencies +=
-    "org.scalaz" %% "scalaz-effect" % "7.2.15")
+    "org.scalaz" %% "scalaz-effect" % "7.2.19")
 
 lazy val bench = jvmModule("bench")
   .enablePlugins(JmhPlugin)
@@ -168,4 +168,4 @@ lazy val macroSettings: Seq[Setting[_]] = Seq(
   libraryDependencies ++= Seq(
     scalaOrganization.value % "scala-compiler" % scalaVersion.value % Provided,
     scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
-    compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)))
+    compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch)))

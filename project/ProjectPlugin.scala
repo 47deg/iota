@@ -6,13 +6,11 @@ import sbtorgpolicies.OrgPoliciesKeys.orgBadgeListSetting
 import sbtorgpolicies.OrgPoliciesPlugin.autoImport._
 import sbtorgpolicies.templates.badges._
 import sbtorgpolicies.templates._
-import sbtorgpolicies.runnable.syntax._
-import dependencies.DependenciesPlugin.autoImport._
 import scoverage.ScoverageKeys._
 import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport._
-import tut.TutPlugin.autoImport._
+import com.timushev.sbt.updates.UpdatesPlugin.autoImport._
 
 object ProjectPlugin extends AutoPlugin {
 
@@ -88,9 +86,11 @@ object ProjectPlugin extends AutoPlugin {
     outputStrategy := Some(StdoutOutput),
     connectInput in run := true,
     cancelable in Global := true,
-
-    crossScalaVersions :=  List("2.11.12", "2.12.4"),
-    scalaVersion       := "2.12.4"
+    crossScalaVersions := List("2.11.12", "2.12.4"),
+    scalaVersion := "2.12.4",
+    dependencyUpdatesFilter -= moduleFilter(organization = "org.eclipse.jetty") |
+      moduleFilter(organization = "org.openjdk.jmh") |
+      moduleFilter(organization = "pl.project13.scala", name = "sbt-jmh-extras")
   )
 
 }
