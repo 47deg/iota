@@ -25,7 +25,7 @@ final class TypeListMacros(val c: Context) {
       index    <- Right(algebras.indexWhere(_ =:= A))
                     .filterOrElse(_ >= 0, s"$A is not a member of $L")
     } yield
-      q"new ${tb.iotaPackage}.TList.Pos[$L, $A]{ override val index: Int = $index }", true)
+      q"new ${tb.iotaPackage}.TList.Pos[$L, $A]{ override val index: scala.Int = $index }", true)
   }
 
   def materializeTListKPos[L <: TListK, F[_]](
@@ -42,7 +42,7 @@ final class TypeListMacros(val c: Context) {
       index    <- Right(algebras.indexWhere(_ =:= F))
                     .filterOrElse(_ >= 0, s"$F is not a member of $L")
     } yield
-      q"new ${tb.iotaPackage}.TListK.Pos[$L, $F]{ override val index: Int = $index }", true)
+      q"new ${tb.iotaPackage}.TListK.Pos[$L, $F]{ override val index: scala.Int = $index }", true)
   }
 
   def materializeTListHPos[L <: TListH, F[_[_]]](
@@ -59,7 +59,7 @@ final class TypeListMacros(val c: Context) {
       index    <- Right(algebras.indexWhere(_ =:= F))
                     .filterOrElse(_ >= 0, s"$F is not a member of $L")
     } yield
-        q"new ${tb.iotaPackage}.TListH.Pos[$L, $F]{ override val index: Int = $index }", true)
+        q"new ${tb.iotaPackage}.TListH.Pos[$L, $F]{ override val index: scala.Int = $index }", true)
   }
 
   def materializeTListLength[L <: TList](
