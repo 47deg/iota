@@ -95,7 +95,7 @@ final class CopKFunctionKMacros(val c: Context) {
 
     val handlers = arrs.zipWithIndex.map { case (arr, i) =>
       val name = TermName(s"arr$i")
-      val pre = q"private[this] val $name = $arr.asInstanceOf[$NatTransType[Any, $G]]"
+      val pre = q"private[this] val $name = $arr.asInstanceOf[$NatTransType[_root_.scala.Any, $G]]"
       val handler = (fa: TermName) => q"$name($fa.value)"
       (pre, handler)
     }

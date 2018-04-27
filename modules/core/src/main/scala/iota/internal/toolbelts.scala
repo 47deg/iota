@@ -396,9 +396,9 @@ private[internal] sealed trait CoproductMacroAPIs { self: MacroToolbelt =>
         (${toIndex(fa)}: @_root_.scala.annotation.switch) match {
           case ..$cases
           case i => throw new _root_.java.lang.Exception(
-            s"iota internal error: index " + i + " out of bounds for " + this)
+            "iota internal error: index " + i + " out of bounds for " + this)
         }
-      override def toString: String = $toStringValue
+      override def toString: _root_.scala.Predef.String = $toStringValue
     }
     """
   }
