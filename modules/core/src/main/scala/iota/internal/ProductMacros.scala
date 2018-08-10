@@ -31,30 +31,6 @@ final class ArraySeq(p: collection.mutable.WrappedArray[Any])
 sealed abstract class OptimisedIndexedSeq[A]
     extends collection.immutable.IndexedSeq[A] {
 
-  // these things can live in scalaz-deriving... here for now
-  // fusion of zip and map
-  def zipmap[B, C](bs: OptimisedIndexedSeq[B])(f: (A, B) => C): List[C] = {
-    var lst: List[C] = Nil
-    var i = length - 1
-    while (i >= 0) {
-      lst ::= f(apply(i), bs(i))
-      i -= 1
-    }
-    lst
-  }
-  def zipmap2[B1, B2, C](
-    b1s: OptimisedIndexedSeq[B1],
-    b2s: OptimisedIndexedSeq[B2]
-  )(f: (A, B1, B2) => C): List[C] = {
-    var lst: List[C] = Nil
-    var i = length - 1
-    while (i >= 0) {
-      lst ::= f(apply(i), b1s(i), b2s(i))
-      i -= 1
-    }
-    lst
-  }
-
   // optimisations...
   override def toList: List[A] = {
     var lst: List[A] = Nil
