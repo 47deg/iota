@@ -22,7 +22,7 @@ final class ProductSeq(p: Product) extends OptimisedIndexedSeq[Any] {
   def length: Int = p.productArity
 }
 
-final class ArraySeq(p: collection.mutable.WrappedArray[Any])
+final class ArraySeq(p: Array[Any])
     extends OptimisedIndexedSeq[Any] {
   def apply(i: Int): Any = p(i)
   def length: Int = p.length
@@ -92,8 +92,9 @@ final class ProductMacros(val c: Context) {
                     require(tpes._1 <:< tpes._2,
                       s"Expected ${tpes._1} <:< ${tpes._2}").toAvowal).toEither
       seq       = if (argTypes.length == 0) q"_root_.scala.collection.immutable.Nil"
-                  else if (argTypes.length == 1) q"new $pkg.ProductSeq(_root_.scala.Tuple1(..$args))"
-                  else if (argTypes.length <= 22) q"new $pkg.ProductSeq((..$args))"
+                  // perf testing shows that ArraySeq is faster than ProductSeq
+                  // else if (argTypes.length == 1) q"new $pkg.ProductSeq(_root_.scala.Tuple1(..$args))"
+                  // else if (argTypes.length <= 22) q"new $pkg.ProductSeq((..$args))"
                   else q"new $pkg.ArraySeq(_root_.scala.Array[_root_.scala.Any](..$args))"
    } yield q"${tb.iotaPackage}.Prod.unsafeApply[$L]($seq)")
   }
